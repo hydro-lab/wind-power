@@ -33,23 +33,39 @@ hfp.spd <- 0.44704 * hfp$Anemometer # converted to m/s from mph, per https://all
 
 ## NEW METHOD - with speed binning
 ## sort data:
-d <- hfp.dir
-s <- hfp.spd
-wind <- array(0, dim = c(36,ceiling(max(s))))
+d <- pit.dir
+s <- pit.spd
+speed.bins <- ceiling(max(s))
+speed.bins <- 6
+wind <- array(0, dim = c(36,speed.bins))
 for (i in 1:(length(s))) {
-      wind[ceiling(d[i]/10),ceiling(s[i])] <- wind[ceiling(d[i]/10),ceiling(s[i])] + 1
+      # speed.index <- ceiling(s[i])
+      ## for use when speed categories exceed colormap (>9)
+      if (s[i] <= 2) {
+            speed.index <- 1
+      } else if (s[i] <= 4) {
+            speed.index <- 2
+      } else if (s[i] <= 6) {
+            speed.index <- 3
+      } else if (s[i] <= 8) {
+            speed.index <- 4
+      } else if (s[i] <= 10) {
+            speed.index <- 5
+      } else {
+            speed.index <- 6
+      }
+      wind[ceiling(d[i]/10),speed.index] <- wind[ceiling(d[i]/10),speed.index] + 1
 }
 ## Now, form long array rather than wide:
-wind.long <- array(NA, dim = 36*ceiling(max(s)))
-for (i in 1:ceiling(max(s))) {
+wind.long <- array(NA, dim = 36*speed.bins)
+for (i in 1:speed.bins) {
       for (j in 1:36) {
             wind.long[(36*(i-1))+j] <- wind[j,i]
       }
 }
-speeds <- c(rep("0-1",36), rep("1-2",36), rep("2-3",36), rep("3-4",36), rep("4-5",36), rep("5-6",36), rep("6-7",36)) # be sure to fill in as many as the wind bins in "wind" allocation
-directions <- rep(5+10*(c(0:35)), ceiling(max(s)))
+speeds <- c(rep("0-2",36), rep("2-4",36), rep("4-6",36), rep("6-8",36), rep("8-10",36), rep("above 10",36)) # be sure to fill in as many as the wind bins in "wind" allocation
+directions <- rep(5+10*(c(0:35)), speed.bins)
 rose <- data.frame(directions, speeds, wind.long)
-names(rose)[2] <- "`Speed (m/s)`"
 
 ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.long)) + 
       labs(caption = "Heinz Field") + 
