@@ -68,7 +68,7 @@ directions <- rep(5+10*(c(0:35)), speed.bins)
 rose <- data.frame(directions, speeds, wind.long)
 
 ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.long)) + 
-      labs(caption = "Heinz Field") + 
+      labs(caption = "Pittsburgh International Airport") + 
       geom_bar(position="stack", stat="identity") +
       scale_fill_brewer("Speed (m/s)", palette = "Blues") +
       coord_polar(theta = "x", start = 0) +
