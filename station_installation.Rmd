@@ -1,0 +1,110 @@
+---
+title: "Wind Ballast Requirements"
+author: "David Kahler, Ph.D., E.I.T."
+date: "09 Sep 2021"
+output: pdf_document
+header-includes: 
+      \usepackage{amsmath}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+library(RColorBrewer)
+```
+
+# Introduction
+Weather data is important for teaching and research.  This weather station includes research-grade instruments and is expandable to include additional instruments in the future for various studies.  In the initial installation, the weather station will record:  
+* Precipitation  
+* Wind speed and direction  
+* Temperature  
+* Humidity  
+
+The data are automatically recorded and loaded to a staging computer for quality control and uploading to an online repository.  This will not require the weather station to be connected directly to the Duquesne University network.  
+
+# Regional Wind  
+The primary purpose of the installation of the weather station is to observe the wind in the area of the Bluff on the campus of Duquesne University.  This area has a southern exposure and likely has strong winds.  For this analysis, we will consider wind records from Pittsburgh International Airport.  The wind rose (Figure 1) was generated based on daily average wind speed and direction since 01 January 2016.  
+
+```{r, message=FALSE, echo=FALSE, fig.cap="Wind rose from Pittsburgh International Airport based on daily average data."}
+pit <- read_csv("https://duq.box.com/shared/static/i9qlh63qdzf5hqvf40dphkbwkh93o2h0.csv")
+d <- pit$`Wind Dir` # degrees
+s <- 0.51444444444 * pit$`Wind Speed`
+speed.bins <- 6 # PIT needs this binning
+wind <- array(0, dim = c(36,speed.bins))
+for (i in 1:(length(s))) {
+      if (s[i] <= 2) {
+            speed.index <- 1 # 0-2
+      } else if (s[i] <= 4) {
+            speed.index <- 2 # 2-4
+      } else if (s[i] <= 6) {
+            speed.index <- 3 # 4-6
+      } else if (s[i] <= 8) {
+            speed.index <- 4 # 6-8
+      } else if (s[i] <= 10) {
+            speed.index <- 5 # 8-10
+      } else {
+            speed.index <- 6 # > 10
+      }
+      wind[ceiling(d[i]/10),speed.index] <- wind[ceiling(d[i]/10),speed.index] + 1
+}
+## Now, form long array rather than wide:
+wind.long <- array(NA, dim = 36*speed.bins)
+for (i in 1:speed.bins) {
+      for (j in 1:36) {
+            wind.long[(36*(i-1))+j] <- wind[j,i]
+      }
+}
+speeds <- c(rep("0-2",36), rep("2-4",36), rep("4-6",36), rep("6-8",36), rep("8-10",36), rep("above 10",36))
+directions <- rep(5+10*(c(0:35)), speed.bins)
+rose <- data.frame(directions, speeds, wind.long)
+ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.long)) + 
+      labs(caption = paste("Pittsburgh International Airport")) + 
+      geom_bar(position="stack", stat="identity") +
+      scale_fill_brewer("Speed (m/s)", palette = "Blues") +
+      coord_polar(theta = "x", start = 0) +
+      scale_x_continuous(breaks = seq(0, 360, 45)) +
+      theme_linedraw() +
+      theme(axis.title = element_blank(), panel.ontop = TRUE, panel.background = element_blank())
+```
+
+```{r hourly, include=FALSE}
+h <- read_csv("https://duq.box.com/shared/static/z5qv9pe482pow0voln9x80x96hyhrcbj.csv", skip = 16)
+hm <- max(h$`Max Wind Gust (mph)`, na.rm = TRUE)
+hm <- hm/2.237
+```
+
+While the average daily wind in the region was `r round(max(s), 1)` m/s, examination of the hourly wind records since 1952 reveal that the maximum gust speed was `r round(hm, 1)` m/s.  Therefore, the calculations presented will use a maximum wind velocity of 35 m/s.
+
+Wind data from Pittsburgh International Airport were obtained from the [Pennsylvania State Climatologist](http://www.climate.psu.edu/data/).  
+
+# Drag  
+The drag force $F_D$ is typically calculated based on the geometry of the object, the fluid velocity, and the drag coefficient, $c_D$.  The drag coefficient reflects how the fluid moves around the object.  In some cases the drag coefficient is variable with flow regime.  However, to give safest ballast requirements, we will consider the maximum flow as determined above.  The instruments have no published drag coefficients.  The instruments will be approximated as two rectangular boxes at half the mast height and on the top of the mast.  The datalogger is contained within a rectangular box that will be mounted on the mast, so this is the actual computation for this component.  In general:  
+
+\begin{equation}
+F_D = \frac{1}{2}\ c_D\ A\ \rho\ U_0^2
+\end{equation}
+
+```{r drag, include=FALSE}
+cD <- 1.18
+w <- 0.45 # width
+h <- 0.50 # height
+b <- 0.30 # depth
+rho <- 1.25
+u <- 33.5
+f <- 0.5 * cD * h * w * rho * u^2
+sM <- 1*f+2*f
+```
+
+where $A$ is the silhouette area, the area perpendicular to the object, $\rho=1.25 kg/m^3$ is the fluid density (air at $10^{\circ} C$), and $U_0$ is the fluid velocity.  For a rectangle with the depth of the object at the same order of magnitude as the front of the object, the drag coefficient is $c_D = 1.18$ (Crowe et al., 2001).  This gives a force of `r round(0.5 * cD * h * w * rho * u^2, 0)` N.
+
+Crowe, C. T., Elger, D. F., Roberson, J. A., (2001), *Engineering Fluid Mechanics*, Seventh edition, Danvers, MA: John C. Wiley & Sons, Inc.
+
+# Moment Arm  
+The design of the instrument mast approximates one rectangular box at half the mast height, where the data logger will be installed, and another box to approximate the instruments at the top of the mast.  The mast height, without lightning protection (see below) should be $2$ m.  The moment is given by $M = r \times F$ for each object, thus the sum of the moments gives $\Sigma M$ = `r round(1*f + 2*f, 0)` $N \cdot m$.  
+
+# Factor of Safety  
+A high factor of safety is recommended as the wind in the area could easily exceed the observed maximum wind speed and the location of the weather station on campus with pedestrians below.  Once the design is complete, an appropriate factor of safety can be assigned to the structural components as the failure tolerance for different materials can differ greatly. 
+
+# Other Considerations  
+The other main consideration for the installation of the weather station is lighting.  The weather station may not be the highest object on the roof of Mellon Hall, but it will be sufficiently high to require grounding for the protection of the instruments and building.  
