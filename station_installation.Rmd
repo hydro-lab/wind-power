@@ -79,15 +79,22 @@ While the average daily wind in the region was `r round(max(s), 1)` m/s, examina
 Wind data from Pittsburgh International Airport were obtained from the [Pennsylvania State Climatologist](http://www.climate.psu.edu/data/).  
 
 # Drag  
+<<<<<<< HEAD
 The drag force $F_D$ is typically calculated based on the geometry of the object, the fluid velocity, and the drag coefficient, $c_D$.  The drag coefficient reflects how the fluid moves around the object.  In some cases the drag coefficient is variable with flow regime.  To give safest ballast requirements, we will consider the maximum flow as determined above.  The instruments have no published drag coefficients.  In general:  
+=======
+The drag force $F_D$ is typically calculated based on the geometry of the object, the fluid velocity, and the drag coefficient, $c_D$.  The drag coefficient reflects how the fluid moves around the object.  In some cases the drag coefficient is variable with flow regime.  However, to give safest ballast requirements, we will consider the maximum flow as determined above.  The instruments have no published drag coefficients.  The instruments will be approximated as two rectangular boxes at half the mast height and on the top of the mast.  The datalogger is contained within a rectangular box that will be mounted on the mast, so this is the actual computation for this component.  In general:  
+>>>>>>> 4b74abcc5e6e08de0b86fbc406a1b71992e9b8c2
 
 \begin{equation}
 F_D = \frac{1}{2}\ c_D\ A\ \rho\ U_0^2
 \end{equation}
 
+<<<<<<< HEAD
 ## Campbell Scientific Instruments  
 The instruments will be approximated as two rectangular boxes: one at half the mast height and one on the top of the mast.  There will also be a solar panel mounted near the lower box.  The datalogger is contained within a rectangular box that will be mounted on the mast, so this is the actual computation for this component.  
 
+=======
+>>>>>>> 4b74abcc5e6e08de0b86fbc406a1b71992e9b8c2
 ```{r drag, include=FALSE}
 cD <- 1.18
 w <- 0.45 # width
@@ -103,12 +110,18 @@ where $A$ is the silhouette area, the area perpendicular to the object, $\rho=1.
 
 Crowe, C. T., Elger, D. F., Roberson, J. A., (2001), *Engineering Fluid Mechanics*, Seventh edition, Danvers, MA: John C. Wiley & Sons, Inc.
 
+<<<<<<< HEAD
 ### Moment Arm  
 The design of the instrument mast approximates one rectangular box at half the mast height, where the data logger will be installed, and another box to approximate the instruments at the top of the mast.  The mast height, without lightning protection (see below) should be $2$ m.  The moment is given by $M = r \times F$ for each object, thus the sum of the moments gives $\Sigma M$ = `r round(1*f + 2*f, 0)` $N \cdot m$.  
 
 ## Meter Instruments  
 
 
+=======
+# Moment Arm  
+The design of the instrument mast approximates one rectangular box at half the mast height, where the data logger will be installed, and another box to approximate the instruments at the top of the mast.  The mast height, without lightning protection (see below) should be $2$ m.  The moment is given by $M = r \times F$ for each object, thus the sum of the moments gives $\Sigma M$ = `r round(1*f + 2*f, 0)` $N \cdot m$.  
+
+>>>>>>> 4b74abcc5e6e08de0b86fbc406a1b71992e9b8c2
 # Factor of Safety  
 A high factor of safety is recommended as the wind in the area could easily exceed the observed maximum wind speed and the location of the weather station on campus with pedestrians below.  Once the design is complete, an appropriate factor of safety can be assigned to the structural components as the failure tolerance for different materials can differ greatly. 
 
