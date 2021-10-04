@@ -19,3 +19,5 @@ henz <- read_csv("https://duq.box.com/shared/static/hg7mr85uqnqwoqlrgcd37x3ce7n8
 henz <- henz %>%
       rename(wspd=`Anemometer (MPH)`) %>%
       mutate(dt = mdy_hm(henz$Timestamp, tz="US/Eastern"))
+
+
