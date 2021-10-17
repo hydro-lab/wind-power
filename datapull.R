@@ -113,3 +113,105 @@ pita <- pita%>%
   rename(baro=`Average Station Pressure (mb)`) %>%
   mutate(dt = mdy_hm(`Date/Time (GMT)`, tz="GMT"))%>%
   select(dt, wspd, gust, rhum, prcp, temp, wdir, baro)
+pita$wspd <- pita$wspd * 0.44704
+pita$gust <- pita$gust * 0.44704
+pita$prcp <- pita$prcp * 25.4
+pita$temp <- pita$temp - 32 * 0.5556
+pita$baro <- pita$baro * 0.750062
+
+#Allegheny County Airport
+alla <- read_csv("https://duq.box.com/shared/static/irlevykc8efzckg91zxt4319kevjypcb.csv")
+alla <- read_csv("https://duq.box.com/shared/static/irlevykc8efzckg91zxt4319kevjypcb.csv", col_types = "cnnnnnnnnnnnccccc")
+alla <- alla%>%
+  rename(wspd=`Average Wind Speed (mph)`) %>%
+  rename(gust=`Max Wind Gust (mph)`) %>%
+  rename(rhum=`Average Relative Humidity (%)`) %>%
+  rename(prcp=`1 Hour Precip (in)`) %>%
+  rename(temp=`Average Temp (F)`) %>%
+  rename(wdir=`Average Wind Direction (deg)`) %>%
+  rename(baro=`Average Station Pressure (mb)`) %>%
+  mutate(dt = mdy_hm(`Date/Time (GMT)`, tz="GMT"))%>%
+  select(dt, wspd, gust, rhum, prcp, temp, wdir, baro)
+alla$wspd <- alla$wspd * 0.44704
+alla$gust <- alla$gust * 0.44704
+alla$prcp <- alla$prcp * 25.4
+alla$temp <- alla$temp - 32 * 0.5556
+alla$baro <- alla$baro * 0.750062
+
+#Liberty 1 - Allegheny County Health Dept
+lib1 <- read_csv("https://duq.box.com/shared/static/pton8ikhj7ylsaqkyrja9cupa73bkw61.csv")
+lib1 <- read_csv("https://duq.box.com/shared/static/pton8ikhj7ylsaqkyrja9cupa73bkw61.csv", col_types = "cnnnnnnnnnn")
+lib1 <- lib1%>%
+  rename(wspd=`scalar wind speed (mph)`) %>%
+  rename(rhum=`rhum (%)`) %>%
+  rename(prcp=`prcp (inches)`) %>%
+  rename(temp=`temp (celsius)`) %>%
+  rename(wdir=`scalar wind direction (degrees)`) %>%
+  rename(baro=`baro (mmhg)`) %>%
+  rename(srrd=`solarrad (w/m2)`) %>%
+  mutate(dt = ymd_hms('prc', tz="US/Eastern"))
+lib1$wspd <- lib1$wspd * 0.44704
+lib1$prcp <- lib1$prcp * 25.4
+
+
+#Lawrenceville - Allegheny County Health Dept
+lawr <- read_csv("https://duq.box.com/shared/static/5ryuf0dr2uf0w3q1dmchpyueikmwgacm.csv")
+lawr <- read_csv("https://duq.box.com/shared/static/5ryuf0dr2uf0w3q1dmchpyueikmwgacm.csv", col_types = "cnnnnnnnnnn")
+lawr <- lawr%>%
+  rename(wspd=`sonicws`) %>%
+  rename(rhum=`out_rh`) %>%
+  rename(prcp=`rainfall`) %>%
+  rename(temp=`out_t`) %>%
+  rename(wdir=`sonicwd`) %>%
+  rename(baro=`bp`) %>%
+  rename(srrd=`solarrad`) %>%
+  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+lawr$wspd <- lawr$wspd * 0.44704
+lawr$prcp <- lawr$prcp * 25.4
+
+
+#North Braddock - Allegheny County Health Dept
+nobr <- read_csv("https://duq.box.com/shared/static/a2o963bjz8djd1jiq79rd3xquqkhczbh.csv")
+nobr <- read_csv("https://duq.box.com/shared/static/a2o963bjz8djd1jiq79rd3xquqkhczbh.csv", col_types = "cnnnnnnnnnn")
+nobr <- nobr%>%
+  rename(wspd=`scalar wind speed (mph)`) %>%
+  rename(rhum=`rhum (%)`) %>%
+  rename(prcp=`prcp (inches)`) %>%
+  rename(temp=`temp (celsius)`) %>%
+  rename(wdir=`scalar wind direction (degrees)`) %>%
+  rename(baro=`baro (mmhg)`) %>%
+  rename(srrd=`solarrad (w/m2)`) %>%
+  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+nobr$wspd <- nobr$wspd * 0.44704
+nobr$prcp <- nobr$prcp * 25.4
+
+#Parkway East 1 - Allegheny County Health Dept
+pea1 <- read_csv("https://duq.box.com/shared/static/esvm9lszv6n2d97hx740f8za4bg2ppgy.csv")
+pea1 <- read_csv("https://duq.box.com/shared/static/esvm9lszv6n2d97hx740f8za4bg2ppgy.csv", col_types = "cnnnnnnnnnn")
+pea1 <- pea1%>%
+  rename(wspd=`scalar wind speed (mph)`) %>%
+  rename(rhum=`rhum (%)`) %>%
+  rename(prcp=`prcp (inches)`) %>%
+  rename(temp=`temp (celsius)`) %>%
+  rename(wdir=`scalar wind direction (degrees)`) %>%
+  rename(baro=`baro (mmhg)`) %>%
+  rename(srrd=`solarrad (w/m2)`) %>%
+  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+pea1$wspd <- pea1$wspd * 0.44704
+pea1$prcp <- pea1$prcp * 25.4
+
+
+#Parkway East 2 - Allegheny County Health Dept
+pea2 <- read_csv("https://duq.box.com/shared/static/16vz69uenlm7hpapjvzep6dpahh7luip.csv")
+pea2 <- read_csv("https://duq.box.com/shared/static/16vz69uenlm7hpapjvzep6dpahh7luip.csv", col_types = "cnnnnnnnnnn")
+pea2 <- pea2%>%
+  rename(wspd=`scalar wind speed (mph)`) %>%
+  rename(rhum=`rhum (%)`) %>%
+  rename(prcp=`prcp (inches)`) %>%
+  rename(temp=`temp (celsius)`) %>%
+  rename(wdir=`scalar wind direction (degrees)`) %>%
+  rename(baro=`baro (mmhg)`) %>%
+  rename(srrd=`solarrad (w/m2)`) %>%
+  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+pea2$wspd <- pea2$wspd * 0.44704
+pea2$prcp <- pea2$prcp * 25.4
