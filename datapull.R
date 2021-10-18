@@ -8,7 +8,7 @@ library(lubridate)
 # Wind speed      wspd  m/s
 
 # Cathedral of Learning
-cath <- read_csv("https://duq.box.com/shared/static/9dryp6f7zdqxnd5hevx01d2j5sxuj0yt.csv")
+cath <- read_csv("https://duq.box.com/shared/static/9dryp6f7zdqxnd5hevx01d2j5sxuj0yt.csv", col_types = "cnnnnnnnnc")
 cath <- cath %>%
       rename(wspd=`Anemometer (MPH)`) %>%
       rename(gust=`10 Minute Wind Gust (MPH)`) %>%
@@ -18,7 +18,8 @@ cath <- cath %>%
       rename(srrd=`Solar Radiation Sensor (Watts Per Square Meter)`) %>%
       rename(temp=`Thermometer (Fahrenheit)`) %>%
       rename(wdir=`Wind Vane (Degrees)`) %>%
-      mutate(dt = mdy_hm(cath$Timestamp, tz="US/Eastern")) # Stores time with time zone in lubridate function (POSIXct)
+      mutate(dt = mdy_hm(cath$Timestamp, tz="US/Eastern")) %>% # Stores time with time zone in lubridate function (POSIXct)
+      select(dt, wspd, gust, rhum, prcp, temp, wdir, baro)
 cath$wspd <- cath$wspd * 0.44704
 cath$gust <- cath$gust * 0.44704
 cath$baro <- cath$baro * 25.4
@@ -212,6 +213,6 @@ pea2 <- pea2%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
 pea2$wspd <- pea2$wspd * 0.44704
 pea2$prcp <- pea2$prcp * 25.4
