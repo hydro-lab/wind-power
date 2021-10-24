@@ -27,7 +27,7 @@ cath$prcp <- cath$prcp * 25.4
 cath$temp <- cath$temp - 32 * 0.5556
 
 # Heinz Field
-henz <- read_csv("https://duq.box.com/shared/static/hg7mr85uqnqwoqlrgcd37x3ce7n8qpdm.csv")
+henz <- read_csv("https://duq.box.com/shared/static/hg7mr85uqnqwoqlrgcd37x3ce7n8qpdm.csv", col_types = "cnnnnnnnn")
 henz <- henz %>%
       rename(wspd=`Anemometer (MPH)`) %>%
       rename(gust=`10 Minute Wind Gust (MPH)`) %>%
@@ -45,7 +45,7 @@ henz$prcp <- henz$prcp * 25.4
 henz$temp <- henz$temp - 32 * 0.5556
 
 #Falk School
-falk <- read_csv("https://duq.box.com/shared/static/uhwwur6mv9kipo6tdxa7h265x5ss1x36.csv")
+falk <- read_csv("https://duq.box.com/shared/static/uhwwur6mv9kipo6tdxa7h265x5ss1x36.csv", col_types = "cnnnnnnnn")
 falk <- falk %>%
       rename(wspd=`Anemometer (MPH)`) %>%
       rename(gust=`10 Minute Wind Gust (MPH)`) %>%
@@ -64,7 +64,7 @@ falk$temp <- falk$temp - 32 * 0.5556
 
 
 #Environmental Charter School
-char <- read_csv("https://duq.box.com/shared/static/q2wptl6izaeu1f4piz9gglxk0k50qfwr.csv")
+char <- read_csv("https://duq.box.com/shared/static/q2wptl6izaeu1f4piz9gglxk0k50qfwr.csv", col_types = "cnnnnnnnn")
 char <- char %>%
   rename(wspd=`Anemometer (Miles Per Hour)`) %>%
   rename(gust=`10 Minute Wind Gust (Miles Per Hour)`) %>%
@@ -83,7 +83,7 @@ char$temp <- char$temp - 32 * 0.5556
 
 
 #Penn State
-penn <- read_csv("https://duq.box.com/shared/static/m88w4uhb5nx5uctq7t4wfmzd3lq8v20r.csv")
+penn <- read_csv("https://duq.box.com/shared/static/m88w4uhb5nx5uctq7t4wfmzd3lq8v20r.csv", col_types = "cnnnnnnnn")
 penn <- penn %>%
   rename(wspd=`Anemometer (MPH)`) %>%
   rename(gust=`10 Minute Wind Gust (MPH)`) %>%
@@ -102,7 +102,6 @@ penn$temp <- penn$temp - 32 * 0.5556
 
 
 #Pittsburgh International Airport
-#pita <- read_csv("https://duq.box.com/shared/static/1rdzbgmp6kti0prpturzzzym7k161c37.csv")
 pita <- read_csv("https://duq.box.com/shared/static/g2h3c34irmotlh2n1wz4dttjs8tgonwl.csv", col_types = "cnnnnnnnnnnnccccc")
 pita <- pita%>%
   rename(wspd=`Average Wind Speed (mph)`) %>%
@@ -121,7 +120,6 @@ pita$temp <- pita$temp - 32 * 0.5556
 pita$baro <- pita$baro * 0.750062
 
 #Allegheny County Airport
-alla <- read_csv("https://duq.box.com/shared/static/irlevykc8efzckg91zxt4319kevjypcb.csv")
 alla <- read_csv("https://duq.box.com/shared/static/irlevykc8efzckg91zxt4319kevjypcb.csv", col_types = "cnnnnnnnnnnnccccc")
 alla <- alla%>%
   rename(wspd=`Average Wind Speed (mph)`) %>%
@@ -140,7 +138,6 @@ alla$temp <- alla$temp - 32 * 0.5556
 alla$baro <- alla$baro * 0.750062
 
 #Liberty 1 - Allegheny County Health Dept
-lib1 <- read_csv("https://duq.box.com/shared/static/pton8ikhj7ylsaqkyrja9cupa73bkw61.csv")
 lib1 <- read_csv("https://duq.box.com/shared/static/pton8ikhj7ylsaqkyrja9cupa73bkw61.csv", col_types = "cnnnnnnnnnn")
 lib1 <- lib1%>%
   rename(wspd=`scalar wind speed (mph)`) %>%
@@ -150,13 +147,12 @@ lib1 <- lib1%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms('prc', tz="US/Eastern"))
+  mutate(dt = ymd_hms(prc, tz="US/Eastern"))
 lib1$wspd <- lib1$wspd * 0.44704
 lib1$prcp <- lib1$prcp * 25.4
 
 
 #Lawrenceville - Allegheny County Health Dept
-lawr <- read_csv("https://duq.box.com/shared/static/5ryuf0dr2uf0w3q1dmchpyueikmwgacm.csv")
 lawr <- read_csv("https://duq.box.com/shared/static/5ryuf0dr2uf0w3q1dmchpyueikmwgacm.csv", col_types = "cnnnnnnnnnn")
 lawr <- lawr%>%
   rename(wspd=`sonicws`) %>%
@@ -166,13 +162,12 @@ lawr <- lawr%>%
   rename(wdir=`sonicwd`) %>%
   rename(baro=`bp`) %>%
   rename(srrd=`solarrad`) %>%
-  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
 lawr$wspd <- lawr$wspd * 0.44704
 lawr$prcp <- lawr$prcp * 25.4
 
 
 #North Braddock - Allegheny County Health Dept
-nobr <- read_csv("https://duq.box.com/shared/static/a2o963bjz8djd1jiq79rd3xquqkhczbh.csv")
 nobr <- read_csv("https://duq.box.com/shared/static/a2o963bjz8djd1jiq79rd3xquqkhczbh.csv", col_types = "cnnnnnnnnnn")
 nobr <- nobr%>%
   rename(wspd=`scalar wind speed (mph)`) %>%
@@ -182,12 +177,11 @@ nobr <- nobr%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
 nobr$wspd <- nobr$wspd * 0.44704
 nobr$prcp <- nobr$prcp * 25.4
 
 #Parkway East 1 - Allegheny County Health Dept
-pea1 <- read_csv("https://duq.box.com/shared/static/esvm9lszv6n2d97hx740f8za4bg2ppgy.csv")
 pea1 <- read_csv("https://duq.box.com/shared/static/esvm9lszv6n2d97hx740f8za4bg2ppgy.csv", col_types = "cnnnnnnnnnn")
 pea1 <- pea1%>%
   rename(wspd=`scalar wind speed (mph)`) %>%
@@ -197,13 +191,12 @@ pea1 <- pea1%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms('dt', tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
 pea1$wspd <- pea1$wspd * 0.44704
 pea1$prcp <- pea1$prcp * 25.4
 
 
 #Parkway East 2 - Allegheny County Health Dept
-pea2 <- read_csv("https://duq.box.com/shared/static/16vz69uenlm7hpapjvzep6dpahh7luip.csv")
 pea2 <- read_csv("https://duq.box.com/shared/static/16vz69uenlm7hpapjvzep6dpahh7luip.csv", col_types = "cnnnnnnnnnn")
 pea2 <- pea2%>%
   rename(wspd=`scalar wind speed (mph)`) %>%
