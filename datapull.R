@@ -218,3 +218,6 @@ Start <- min(Earliest)
 ST_HR <- Start/3600
 
 Last <- max(c(max(as.numeric(pita$dt)), max(as.numeric(falk$dt)), max(as.numeric(cath$dt)), max(as.numeric(henz$dt)), max(as.numeric(char$dt)), max(as.numeric(penn$dt)), max(as.numeric(alla$dt)), max(as.numeric(lib1$dt)), max(as.numeric(lawr$dt)), max(as.numeric(nobr$dt)), max(as.numeric(pea1$dt)), max(as.numeric(pea2$dt))))
+
+#Find Positions
+Position <- mutate(pita, order=(dt/3600)-ST_HR +1)
