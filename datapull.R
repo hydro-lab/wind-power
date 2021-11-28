@@ -209,3 +209,12 @@ pea2 <- pea2%>%
   mutate(dt = ymd_hms(dt, tz="US/Eastern"))
 pea2$wspd <- pea2$wspd * 0.44704
 pea2$prcp <- pea2$prcp * 25.4
+
+#Get Dates/Times
+Earliest <- c(min(as.numeric(pita$dt)), min(as.numeric(falk$dt)), min(as.numeric(cath$dt)), min(as.numeric(henz$dt)), min(as.numeric(char$dt)), min(as.numeric(penn$dt)), min(as.numeric(alla$dt)), min(as.numeric(lib1$dt)), min(as.numeric(lawr$dt)), min(as.numeric(nobr$dt)), min(as.numeric(pea1$dt)), min(as.numeric(pea2$dt)))
+
+Start <- min(Earliest)
+
+ST_HR <- Start/3600
+
+Last <- max(c(max(as.numeric(pita$dt)), max(as.numeric(falk$dt)), max(as.numeric(cath$dt)), max(as.numeric(henz$dt)), max(as.numeric(char$dt)), max(as.numeric(penn$dt)), max(as.numeric(alla$dt)), max(as.numeric(lib1$dt)), max(as.numeric(lawr$dt)), max(as.numeric(nobr$dt)), max(as.numeric(pea1$dt)), max(as.numeric(pea2$dt))))
