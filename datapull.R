@@ -211,13 +211,28 @@ pea2$wspd <- pea2$wspd * 0.44704
 pea2$prcp <- pea2$prcp * 25.4
 
 #Get Dates/Times
-Earliest <- c(min(as.numeric(pita$dt)), min(as.numeric(falk$dt)), min(as.numeric(cath$dt)), min(as.numeric(henz$dt)), min(as.numeric(char$dt)), min(as.numeric(penn$dt)), min(as.numeric(alla$dt)), min(as.numeric(lib1$dt)), min(as.numeric(lawr$dt)), min(as.numeric(nobr$dt)), min(as.numeric(pea1$dt)), min(as.numeric(pea2$dt)))
+Earliest <- c(min(as.numeric(pita$dt)), min(as.numeric(falk$dt)), min(as.numeric(cath$dt)), min(as.numeric(henz$dt)), min(as.numeric(char$dt)), min(as.numeric(penn$dt)), min(as.numeric(alla$dt)), min(as.numeric(lib1$dt), na.rm = TRUE), min(as.numeric(lawr$dt), na.rm = TRUE), min(as.numeric(nobr$dt), na.rm = TRUE), min(as.numeric(pea1$dt), na.rm = TRUE), min(as.numeric(pea2$dt), na.rm = TRUE))
 
 Start <- min(Earliest)
 
 ST_HR <- Start/3600
 
-Last <- max(c(max(as.numeric(pita$dt)), max(as.numeric(falk$dt)), max(as.numeric(cath$dt)), max(as.numeric(henz$dt)), max(as.numeric(char$dt)), max(as.numeric(penn$dt)), max(as.numeric(alla$dt)), max(as.numeric(lib1$dt)), max(as.numeric(lawr$dt)), max(as.numeric(nobr$dt)), max(as.numeric(pea1$dt)), max(as.numeric(pea2$dt))))
+Last <- max(c(max(as.numeric(pita$dt)), max(as.numeric(falk$dt)), max(as.numeric(cath$dt)), max(as.numeric(henz$dt)), max(as.numeric(char$dt)), max(as.numeric(penn$dt)), max(as.numeric(alla$dt)), max(as.numeric(lib1$dt), na.rm = TRUE), max(as.numeric(lawr$dt), na.rm = TRUE), max(as.numeric(nobr$dt), na.rm = TRUE), max(as.numeric(pea1$dt), na.rm = TRUE), max(as.numeric(pea2$dt), na.rm = TRUE)))
 
-#Find Positions
-Position <- mutate(pita, order=(dt/3600) - ST_HR + 1)
+#Find Positions (Add all sites)
+pita <- mutate(pita, order=(as.numeric(dt)/3600) - ST_HR + 1)
+
+#Build Table (in hours) (Add all sites)
+len <- (Last - Start)/3600 + 1
+
+pita.sp <- array(NA, dim =len)
+falk.sp <- pita.sp
+
+#Loop - Filling the Table 1
+for(i in 1:nrow(pita)) {
+  pita.sp[pita$order[i]]<-pita$wspd[i]
+}
+
+#Filling the Table 2
+HR <- c((Start/3600): (Last/3600))
+speeds <- data.frame(HR, pita.sp, falk.sp)
