@@ -253,50 +253,40 @@ pea2.sp <- array(NA, dim =len)
 for(i in 1:nrow(pita)) {
   pita.sp[pita$order[i]]<-pita$wspd[i]
 }
-
 for(i in 1:nrow(cath)) {
   cath.sp[cath$order[i]]<-cath$wspd[i]
 }
-
 for(i in 1:nrow(henz)) {
   henz.sp[henz$order[i]]<-henz$wspd[i]
 }
-
 for(i in 1:nrow(falk)) {
   falk.sp[falk$order[i]]<-falk$wspd[i]
 }
-
 for(i in 1:nrow(char)) {
   char.sp[char$order[i]]<-char$wspd[i]
 }
-
 for(i in 1:nrow(penn)) {
   penn.sp[penn$order[i]]<-penn$wspd[i]
 }
-
 for(i in 1:nrow(alla)) {
   alla.sp[alla$order[i]]<-alla$wspd[i]
 }
-
 for(i in 1:nrow(lib1)) {
   lib1.sp[lib1$order[i]]<-lib1$wspd[i]
 }
-
 for(i in 1:nrow(lawr)) {
   lawr.sp[lawr$order[i]]<-lawr$wspd[i]
 }
-
 for(i in 1:nrow(nobr)) {
   nobr.sp[nobr$order[i]]<-nobr$wspd[i]
 }
-
 for(i in 1:nrow(pea1)) {
   pea1.sp[pea1$order[i]]<-pea1$wspd[i]
 }
-
 for(i in 1:nrow(pea2)) {
   pea2.sp[pea2$order[i]]<-pea2$wspd[i]
 }
+
 #Filling the Table 2
 HR <- c((Start/3600): (Last/3600))
 speeds <- data.frame(HR, pita.sp, cath.sp, henz.sp, falk.sp, char.sp, penn.sp, alla.sp, lib1.sp, lawr.sp, nobr.sp, pea1.sp, pea2.sp)
