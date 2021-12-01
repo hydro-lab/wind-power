@@ -219,20 +219,84 @@ ST_HR <- Start/3600
 
 Last <- max(c(max(as.numeric(pita$dt)), max(as.numeric(falk$dt)), max(as.numeric(cath$dt)), max(as.numeric(henz$dt)), max(as.numeric(char$dt)), max(as.numeric(penn$dt)), max(as.numeric(alla$dt)), max(as.numeric(lib1$dt), na.rm = TRUE), max(as.numeric(lawr$dt), na.rm = TRUE), max(as.numeric(nobr$dt), na.rm = TRUE), max(as.numeric(pea1$dt), na.rm = TRUE), max(as.numeric(pea2$dt), na.rm = TRUE)))
 
-#Find Positions (Add all sites)
+#Find Positions
 pita <- mutate(pita, order=(as.numeric(dt)/3600) - ST_HR + 1)
+cath <- mutate(cath, order=(as.numeric(dt)/3600) - ST_HR + 1)
+henz <- mutate(henz, order=(as.numeric(dt)/3600) - ST_HR + 1)
+falk <- mutate(falk, order=(as.numeric(dt)/3600) - ST_HR + 1)
+char <- mutate(char, order=(as.numeric(dt)/3600) - ST_HR + 1)
+penn <- mutate(penn, order=(as.numeric(dt)/3600) - ST_HR + 1)
+alla <- mutate(alla, order=(as.numeric(dt)/3600) - ST_HR + 1)
+lib1 <- mutate(lib1, order=(as.numeric(dt)/3600) - ST_HR + 1)
+lawr <- mutate(lawr, order=(as.numeric(dt)/3600) - ST_HR + 1)
+nobr <- mutate(nobr, order=(as.numeric(dt)/3600) - ST_HR + 1)
+pea1 <- mutate(pea1, order=(as.numeric(dt)/3600) - ST_HR + 1)
+pea2 <- mutate(pea2, order=(as.numeric(dt)/3600) - ST_HR + 1)
 
-#Build Table (in hours) (Add all sites)
+#Build Table (in hours)
 len <- (Last - Start)/3600 + 1
 
 pita.sp <- array(NA, dim =len)
-falk.sp <- pita.sp
+cath.sp <- array(NA, dim =len)
+henz.sp <- array(NA, dim =len)
+falk.sp <- array(NA, dim =len)
+char.sp <- array(NA, dim =len)
+penn.sp <- array(NA, dim =len)
+alla.sp <- array(NA, dim =len)
+lib1.sp <- array(NA, dim =len)
+lawr.sp <- array(NA, dim =len)
+nobr.sp <- array(NA, dim =len)
+pea1.sp <- array(NA, dim =len)
+pea2.sp <- array(NA, dim =len)
 
 #Loop - Filling the Table 1
 for(i in 1:nrow(pita)) {
   pita.sp[pita$order[i]]<-pita$wspd[i]
 }
 
+for(i in 1:nrow(cath)) {
+  cath.sp[cath$order[i]]<-cath$wspd[i]
+}
+
+for(i in 1:nrow(henz)) {
+  henz.sp[henz$order[i]]<-henz$wspd[i]
+}
+
+for(i in 1:nrow(falk)) {
+  falk.sp[falk$order[i]]<-falk$wspd[i]
+}
+
+for(i in 1:nrow(char)) {
+  char.sp[char$order[i]]<-char$wspd[i]
+}
+
+for(i in 1:nrow(penn)) {
+  penn.sp[penn$order[i]]<-penn$wspd[i]
+}
+
+for(i in 1:nrow(alla)) {
+  alla.sp[alla$order[i]]<-alla$wspd[i]
+}
+
+for(i in 1:nrow(lib1)) {
+  lib1.sp[lib1$order[i]]<-lib1$wspd[i]
+}
+
+for(i in 1:nrow(lawr)) {
+  lawr.sp[lawr$order[i]]<-lawr$wspd[i]
+}
+
+for(i in 1:nrow(nobr)) {
+  nobr.sp[nobr$order[i]]<-nobr$wspd[i]
+}
+
+for(i in 1:nrow(pea1)) {
+  pea1.sp[pea1$order[i]]<-pea1$wspd[i]
+}
+
+for(i in 1:nrow(pea2)) {
+  pea2.sp[pea2$order[i]]<-pea2$wspd[i]
+}
 #Filling the Table 2
 HR <- c((Start/3600): (Last/3600))
-speeds <- data.frame(HR, pita.sp, falk.sp)
+speeds <- data.frame(HR, pita.sp, cath.sp, henz.sp, falk.sp, char.sp, penn.sp, alla.sp, lib1.sp, lawr.sp, nobr.sp, pea1.sp, pea2.sp)
