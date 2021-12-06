@@ -293,6 +293,8 @@ speeds <- data.frame(HR, pita.sp, cath.sp, henz.sp, falk.sp, char.sp, penn.sp, a
 
 library(tidyr)
 speeds_long <- pivot_longer(speeds, names_to = "site", values_to = "speed")
+ggplot(speeds_long) +
+      geom_line(aes(x = HR, y = speed, color = site))
 
 mod <- lm(pita.sp~cath.sp+henz.sp, data = speeds)
 summary(mod)
