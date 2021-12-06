@@ -290,3 +290,12 @@ for(i in 1:nrow(pea2)) {
 #Filling the Table 2
 HR <- c((Start/3600): (Last/3600))
 speeds <- data.frame(HR, pita.sp, cath.sp, henz.sp, falk.sp, char.sp, penn.sp, alla.sp, lib1.sp, lawr.sp, nobr.sp, pea1.sp, pea2.sp)
+
+library(tidyr)
+speeds_long <- pivot_longer(speeds, names_to = "site", values_to = "speed")
+
+mod <- lm(pita.sp~cath.sp+henz.sp, data = speeds)
+summary(mod)
+confint(mod)
+
+hist(speeds$pita.sp)
