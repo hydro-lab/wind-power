@@ -9,7 +9,7 @@ library(lubridate)
 x <- read_csv("/Users/davidkahler/Downloads/mellon_MellonRoof1.dat", skip = 4, col_names = FALSE)
 
 # station installed on:
-install <- as.numeric(ymd_hms("2021-11-12T20:30:00"))
+install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
 # sort and tidy data. 
 x <- x %>% 
       rename(TIMESTAMP = X1, # date and time
@@ -27,58 +27,164 @@ x <- x %>%
              WS_ms_Min = X13, # minimum wind speed
              WS_ms_TMn = X14, # time of minimum wind speed
              WS_ms_Std = X15, # standard deviation of wind speed over period
-             WS_ms_S_WVT = X16, # don't know
+             WS_ms_S_WVT = X16, # don't know; appears to be same as average
              WindDir_D1_WVT = X17, # wind direction
              WindDir_SD1_WVT = X18, # standard deviation of wind direction
              Rain_mm_Tot = X19) %>% # incremental rainfall, mm
-      mutate(unix_utc = as.numeric(ymd_hms(TIMESTAMP)), 
-             BattV_Avg_qc = NA, 
-             AirTC_Avg_qc = NA, 
-             AirTC_Max_qc = NA, 
-             AirTC_TMx_qc = NA, 
-             AirTC_Min_qc = NA, 
-             AirTC_TMn_qc = NA, 
-             AirTC_Std_qc = NA, 
-             WS_ms_Avg_qc = NA, 
-             WS_ms_Max_qc = NA, 
-             WS_ms_TMx_qc = NA, 
-             WS_ms_Min_qc = NA, 
-             WS_ms_TMn_qc = NA, 
-             WS_ms_Std_qc = NA, 
-             WS_ms_S_WVT_qc = NA, 
-             WindDir_D1_WVT_qc = NA, 
-             WindDir_SD1_WVT_qc = NA, 
-             Rain_mm_Tot_qc = NA) %>% 
+      select(-RECORD, -WS_ms_S_WVT, -AirTC_TMx, -AirTC_TMn, -WS_ms_TMx, -WS_ms_TMn) %>% 
+      mutate(time_utc = ymd_hms(TIMESTAMP), 
+             unix_utc = as.numeric(time_utc), 
+             time_et = with_tz(time_utc, tz = "US/Eastern"), 
+             utc_offset = (as.numeric(force_tz(time_et, tz = "UTC")) - unix_utc)/3600, 
+             BattV_Avg_qc = "", 
+             AirTC_Avg_qc = "", 
+             AirTC_Max_qc = "", 
+             AirTC_Min_qc = "", 
+             AirTC_Std_qc = "", 
+             RHpct_Min = -9999, # allocate for missing data
+             RHpct_Min_qc = "m", 
+             RHpct_Max = -9999, # allocate for missing data
+             RHpct_Max_qc = "m", 
+             WS_ms_Avg_qc = "", 
+             WS_ms_Max_qc = "", 
+             WS_ms_Min_qc = "", 
+             WS_ms_Std_qc = "", 
+             WindDir_D1_WVT_qc = "", 
+             WindDir_SD1_WVT_qc = "", 
+             Rain_mm_Tot_qc = "") %>% 
+      select(-TIMESTAMP) %>% 
       filter(unix_utc >= install)
 
 # For export to CUAHSI:
 for (i in 1:nrow(x)) {
-      if (x$BattV_Avg[i] < 10) {
+      if (x$BattV_Avg[i] >= 10) {
+            x$BattV_Avg_qc[i] <- "n" # "n" battery stable
+      } else {
             x$BattV_Avg_qc[i] <- "b" # "b" battery fault
-      } else {
-            x$BattV_Avg_qc[i] <- "a" # "a" battery stable
+            x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "b,")
+            x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "b,")
+            x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "b,")
+            x$AirTC_Std_qc[i] <- paste0(x$AirTC_Std_qc[i], "b,")
+            x$RHpct_Min_qc[i] <- paste0(x$RHpct_Min_qc[i], "b,")
+            x$RHpct_Max_qc[i] <- paste0(x$RHpct_Max_qc[i], "b,")
+            x$WS_ms_Avg_qc[i] <- paste0(x$WS_ms_Avg_qc[i], "b,")
+            x$WS_ms_Max_qc[i] <- paste0(x$WS_ms_Max_qc[i], "b,")
+            x$WS_ms_Min_qc[i] <- paste0(x$WS_ms_Min_qc[i], "b,")
+            x$WS_ms_Std_qc[i] <- paste0(x$WS_ms_Std_qc[i], "b,")
+            x$WindDir_D1_WVT_qc[i] <- paste0(x$WindDir_D1_WVT_qc[i], "b,")
+            x$WindDir_SD1_WVT_qc[i] <- paste0(x$WindDir_SD1_WVT_qc[i], "b,")
+            x$Rain_mm_Tot_qc[i] <- paste0(x$Rain_mm_Tot_qc[i], "b,")
       }
+     if (is.na(x$AirTC_Avg[i])) {
+          x$AirTC_Avg[i] <- -9999
+          x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "m,") #
+     } else {
       if (x$AirTC_Avg[i] <- -40) {
-            x$AirTC_Avg_qc[i] <- "lt" # "lt" temperature below valid range
+            x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "l,") # "l" temperature below valid range
       } else if (x$AirTC_Avg[i] > 70) {
-            x$AirTC_Avg_qc[i] <- "ht" # "ht" temperature above valid range
-      } else {
-            x$AirTC_Avg_qc[i] <- "a"
+            x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "h,") # "h" temperature above valid range
       }
+     if ((x$AirTC_Avg[i] <= x$AirTC_Max[i]) & (x$AirTC_Avg[i] >= x$AirTC_Min[i])) { # If average is outside the range [min,max]
+          x$AirTC_Avg_qc[i] <- x$AirTC_Avg_qc[i]
+     } else {
+          x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "i,") # "i" instrument error
+     }
+     if (i > 4) {
+          if ( (x$AirTC_Avg[i] < (mean(x$AirTC_Avg[(i-4):(i-1)]) - 3 * ( max(x$AirTC_Avg[(i-4):(i-1)]) - min(x$AirTC_Avg[(i-4):(i-1)]) ) )) | (x$AirTC_Avg[i] > (mean(x$AirTC_Avg[(i-4):(i-1)]) + 3 * ( max(x$AirTC_Avg[(i-4):(i-1)]) - min(x$AirTC_Avg[(i-4):(i-1)]) ) )) ) {
+               x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "s,") # "s" spike detected
+          }
+     }
+     }
+     if (is.na(x$AirTC_Max[i])) {
+          x$AirTC_Max[i] <- -9999
+          x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "m,") #
+     } else {
       if (x$AirTC_Max[i] <- -40) {
-            x$AirTC_Max_qc[i] <- "lt" # "lt" temperature below valid range
+            x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "l,")
       } else if (x$AirTC_Max[i] > 70) {
-            x$AirTC_Max_qc[i] <- "ht" # "ht" temperature above valid range
-      } else {
-            x$AirTC_Max_qc[i] <- "a"
+            x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "h,")
       }
+     }
+     if (is.na(x$AirTC_Min[i])) {
+          x$AirTC_Avg[i] <- -9999
+          x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "m,") #
+     } else {
       if (x$AirTC_Min[i] <- -40) {
-            x$AirTC_Min_qc[i] <- "lt" # "lt" temperature below valid range
+           x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "l,")
       } else if (x$AirTC_Min[i] > 70) {
-            x$AirTC_Min_qc[i] <- "ht" # "ht" temperature above valid range
-      } else {
-            x$AirTC_Min_qc[i] <- "a"
+           x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "h,")
       }
+     }
+     if (is.na(x$RHpct_Min[i])) {
+          x$RHpct_Min[i] <- -9999
+          x$RHpct_Min_qc[i] <- paste0(x$RHpct_Min_qc[i], "m,") #
+     } else {
+     if (x$RHpct_Min[i] < 0) {
+          x$RHpct_Min_qc[i] <- paste0(x$RHpct_Min_qc[i], "l,")
+     }
+     if (x$RHpct_Min[i] > 100) {
+          x$RHpct_Min_qc[i] <- paste0(x$RHpct_Min_qc[i], "h,")
+     }
+          if (i > 4) {
+               if ( (x$RHpct_Min[i] < (mean(x$RHpct_Min[(i-4):(i-1)]) - 3 * ( max(x$RHpct_Min[(i-4):(i-1)]) - min(x$RHpct_Min[(i-4):(i-1)]) ) )) | (x$RHpct_Min[i] > (mean(x$RHpct_Min[(i-4):(i-1)]) + 3 * ( max(x$RHpct_Min[(i-4):(i-1)]) - min(x$RHpct_Min[(i-4):(i-1)]) ) )) ) {
+                    x$RHpct_Min_qc[i] <- paste0(x$RHpct_Min_qc[i], "s,") # "s" spike detected
+               }
+          }
+     }
+     if (is.na(x$RHpct_Max[i])) {
+          x$RHpct_Max[i] <- -9999
+          x$RHpct_Max_qc[i] <- paste0(x$RHpct_Max_qc[i], "m,") #
+     } else {
+     if (x$RHpct_Max[i] < 0) {
+          x$RHpct_Max_qc[i] <- paste0(x$RHpct_Max_qc[i], "l,")
+     }
+     if (x$RHpct_Max[i] > 100) {
+          x$RHpct_Max_qc[i] <- paste0(x$RHpct_Max_qc[i], "h,")
+     }
+     if (i > 4) {
+          if ( (x$RHpct_Max[i] < (mean(x$RHpct_Max[(i-4):(i-1)]) - 3 * ( max(x$RHpct_Max[(i-4):(i-1)]) - min(x$RHpct_Max[(i-4):(i-1)]) ) )) | (x$RHpct_Max[i] > (mean(x$RHpct_Max[(i-4):(i-1)]) + 3 * ( max(x$RHpct_Max[(i-4):(i-1)]) - min(x$RHpct_Max[(i-4):(i-1)]) ) )) ) {
+               x$RHpct_Max_qc[i] <- paste0(x$RHpct_Max_qc[i], "s,") # "s" spike detected
+          }
+     }
+     }
+     if (x$WS_ms_Avg[i] < 0) {
+          x$WS_ms_Avg_qc[i] <- paste0(x$WS_ms_Avg_qc[i], "l,")
+     }
+     if (x$WS_ms_Avg[i] > 100) {
+          x$WS_ms_Avg_qc[i] <- paste0(x$WS_ms_Avg_qc[i], "h,")
+     }
+     if (x$WS_ms_Min[i] < 0) {
+          x$WS_ms_Min_qc[i] <- paste0(x$WS_ms_Min_qc[i], "l,")
+     }
+     if (x$WS_ms_Min[i] > 100) {
+          x$WS_ms_Min_qc[i] <- paste0(x$WS_ms_Min_qc[i], "h,")
+     }
+     if (x$WS_ms_Max[i] < 0) {
+          x$WS_ms_Max_qc[i] <- paste0(x$WS_ms_Max_qc[i], "l,")
+     }
+     if (x$WS_ms_Min[i] > 100) {
+          x$WS_ms_Max_qc[i] <- paste0(x$WS_ms_Max_qc[i], "h,")
+     }
+     if (x$x$WindDir_D1_WVT[i] < 0) {
+          x$x$WindDir_D1_WVT_qc[i] <- paste0(x$WindDir_D1_WVT_qc[i], "l,")
+     }
+     if (x$WindDir_D1_WVT[i] > 360) {
+          x$WindDir_D1_WVT_qc[i] <- paste0(x$WindDir_D1_WVT_qc[i], "h,")
+     }
+     # If there haven't been any problems so far, assign each "a, normal operation"
+     if (x$AirTC_Avg_qc[i] == "") {x$AirTC_Avg_qc[i] <- "a"}
+     if (x$AirTC_Max_qc[i] == "") {x$AirTC_Max_qc[i] <- "a"}
+     if (x$AirTC_Min_qc[i] == "") {x$AirTC_Min_qc[i] <- "a"}
+     if (x$AirTC_Std_qc[i] == "") {x$AirTC_Std_qc[i] <- "a"}
+     if (x$RHpct_Min_qc[i] == "") {x$RHpct_Min_qc[i] <- "a"}
+     if (x$RHpct_Max_qc[i] == "") {x$RHpct_Max_qc[i] <- "a"}
+     if (x$WS_ms_Avg_qc[i] == "") {x$WS_ms_Avg_qc[i] <- "a"}
+     if (x$WS_ms_Max_qc[i] == "") {x$WS_ms_Max_qc[i] <- "a"}
+     if (x$WS_ms_Min_qc[i] == "") {x$WS_ms_Min_qc[i] <- "a"}
+     if (x$WS_ms_Std_qc[i] == "") {x$WS_ms_Std_qc[i] <- "a"}
+     if (x$WindDir_D1_WVT_qc[i] == "") {x$WindDir_D1_WVT_qc[i] <- "a"}
+     if (x$WindDir_SD1_WVT_qc[i] == "") {x$WindDir_SD1_WVT_qc[i] <- "a"}
+     if (x$Rain_mm_Tot_qc[i] == "") {x$Rain_mm_Tot_qc[i] <- "a"}
 }
 
 
