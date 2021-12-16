@@ -6,7 +6,7 @@ library(tidyr)
 library(forcats)
 library(lubridate)
 
-x <- read_csv("mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
+x <- read_csv("/Users/davidkahler/Downloads/mellon_MellonRoof1.dat", skip = 4, col_names = FALSE)
 
 # station installed on:
 install <- as.numeric(ymd_hms("2021-11-12T20:30:00"))
