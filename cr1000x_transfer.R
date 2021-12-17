@@ -7,9 +7,12 @@ library(forcats)
 library(lubridate)
 
 x <- read_csv("/Users/davidkahler/Downloads/mellon_MellonRoof1.dat", skip = 4, col_names = FALSE)
+t <- read_csv("download_record.csv", col_names = FALSE) # all in UTC
 
 # station installed on:
 install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
+# previous download got to:
+first_record <- t$X3[nrow] + 1 # moves to one second after last download, must rewrite
 # sort and tidy data. 
 x <- x %>% 
       rename(TIMESTAMP = X1, # date and time
@@ -53,7 +56,9 @@ x <- x %>%
              WindDir_SD1_WVT_qc = "", 
              Rain_mm_Tot_qc = "") %>% 
       select(-TIMESTAMP) %>% 
-      filter(unix_utc >= install)
+      filter(unix_utc >= first_record)
+
+first_record <- x$unix_utc[1] # use this in subsequent downloads, not if the post-install must be redone.
 
 # For export to CUAHSI:
 for (i in 1:nrow(x)) {
@@ -147,29 +152,49 @@ for (i in 1:nrow(x)) {
           }
      }
      }
+     if (is.na(x$WS_ms_Avg[i])) {
+          x$WS_ms_Avg[i] <- -9999
+          x$WS_ms_Avg_qc[i] <- paste0(x$WS_ms_Avg_qc[i], "m,") #
+     } else {
      if (x$WS_ms_Avg[i] < 0) {
           x$WS_ms_Avg_qc[i] <- paste0(x$WS_ms_Avg_qc[i], "l,")
      }
      if (x$WS_ms_Avg[i] > 100) {
           x$WS_ms_Avg_qc[i] <- paste0(x$WS_ms_Avg_qc[i], "h,")
      }
+     }
+     if (is.na(x$WS_ms_Min[i])) {
+          x$WS_ms_Min[i] <- -9999
+          x$WS_ms_Min_qc[i] <- paste0(x$WS_ms_Min_qc[i], "m,") #
+     } else {
      if (x$WS_ms_Min[i] < 0) {
           x$WS_ms_Min_qc[i] <- paste0(x$WS_ms_Min_qc[i], "l,")
      }
      if (x$WS_ms_Min[i] > 100) {
           x$WS_ms_Min_qc[i] <- paste0(x$WS_ms_Min_qc[i], "h,")
      }
+     }
+     if (is.na(x$WS_ms_Max[i])) {
+          x$WS_ms_Max[i] <- -9999
+          x$WS_ms_Max_qc[i] <- paste0(x$WS_ms_Max_qc[i], "m,") #
+     } else {
      if (x$WS_ms_Max[i] < 0) {
           x$WS_ms_Max_qc[i] <- paste0(x$WS_ms_Max_qc[i], "l,")
      }
      if (x$WS_ms_Min[i] > 100) {
           x$WS_ms_Max_qc[i] <- paste0(x$WS_ms_Max_qc[i], "h,")
      }
-     if (x$x$WindDir_D1_WVT[i] < 0) {
+     }
+     if (is.na(x$WindDir_D1_WVT[i])) {
+          x$WindDir_D1_WVT[i] <- -9999
+          x$WindDir_D1_WVT_qc[i] <- paste0(x$WindDir_D1_WVT_qc[i], "m,") #
+     } else {
+     if (x$WindDir_D1_WVT[i] < 0) {
           x$x$WindDir_D1_WVT_qc[i] <- paste0(x$WindDir_D1_WVT_qc[i], "l,")
      }
      if (x$WindDir_D1_WVT[i] > 360) {
           x$WindDir_D1_WVT_qc[i] <- paste0(x$WindDir_D1_WVT_qc[i], "h,")
+     }
      }
      # If there haven't been any problems so far, assign each "a, normal operation"
      if (x$AirTC_Avg_qc[i] == "") {x$AirTC_Avg_qc[i] <- "a"}
@@ -187,6 +212,11 @@ for (i in 1:nrow(x)) {
      if (x$Rain_mm_Tot_qc[i] == "") {x$Rain_mm_Tot_qc[i] <- "a"}
 }
 
+export <- x[,c(13,14,15,16,1,17,2,18,4,20,3,19,5,21,22,23,24,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)]
 
+today <- Sys.Date()
+last_record <- x$unix_utc[nrow(x)]
+r <- data.frame(today,first_record,last_record)
+write_csv(r, "download_record.csv", append = TRUE)
 
 # For export to hydro-lab.github.io, daily data and plots
