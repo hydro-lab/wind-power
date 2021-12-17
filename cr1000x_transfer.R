@@ -6,13 +6,13 @@ library(tidyr)
 library(forcats)
 library(lubridate)
 
-x <- read_csv("/Users/davidkahler/Downloads/mellon_MellonRoof1.dat", skip = 4, col_names = FALSE)
+x <- read_csv("mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
 t <- read_csv("download_record.csv", col_names = FALSE) # all in UTC
 
 # station installed on:
 install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
 # previous download got to:
-first_record <- t$X3[nrow] + 1 # moves to one second after last download, must rewrite
+first_record <- t$X3[nrow(t)] + 1 # moves to one second after last download, must rewrite
 # sort and tidy data. 
 x <- x %>% 
      rename(TIMESTAMP = X1, # date and time
@@ -33,8 +33,12 @@ x <- x %>%
             WS_ms_S_WVT = X16, # don't know; appears to be same as average
             WindDir_D1_WVT = X17, # wind direction
             WindDir_SD1_WVT = X18, # standard deviation of wind direction
-            Rain_mm_Tot = X19) %>% # incremental rainfall, mm
-     select(-RECORD, -WS_ms_S_WVT, -AirTC_TMx, -AirTC_TMn, -WS_ms_TMx, -WS_ms_TMn) %>% 
+            Rain_mm_Tot = X19, # incremental rainfall, mm
+            RHpct_Max = X20, # maximum relative humidity
+            RHpct_TMx = X21, # time of maximum relative humidity
+            RHpct_Min = X22, # minimum relative humidity
+            RHpct_TMn = X23) %>% # time of minimum relative humidity
+     select(-RECORD, -WS_ms_S_WVT, -AirTC_TMx, -AirTC_TMn, -RHpct_TMx, -RHpct_TMn, -WS_ms_TMx, -WS_ms_TMn) %>% 
      mutate(time_utc = ymd_hms(TIMESTAMP), 
             unix_utc = as.numeric(time_utc), 
             time_et = with_tz(time_utc, tz = "US/Eastern"), 
@@ -44,10 +48,8 @@ x <- x %>%
             AirTC_Max_qc = "", 
             AirTC_Min_qc = "", 
             AirTC_Std_qc = "", 
-            RHpct_Min = -9999, # allocate for missing data
-            RHpct_Min_qc = "m", 
-            RHpct_Max = -9999, # allocate for missing data
-            RHpct_Max_qc = "m", 
+            RHpct_Min_qc = "", 
+            RHpct_Max_qc = "", 
             WS_ms_Avg_qc = "", 
             WS_ms_Max_qc = "", 
             WS_ms_Min_qc = "", 
@@ -56,7 +58,7 @@ x <- x %>%
             WindDir_SD1_WVT_qc = "", 
             Rain_mm_Tot_qc = "") %>% 
      select(-TIMESTAMP) %>% 
-     filter(unix_utc >= first_record)
+     filter(unix_utc >= first_record) # first_record or install date
 
 first_record <- x$unix_utc[1] # use this in subsequent downloads, not if the post-install must be redone.
 
@@ -84,7 +86,7 @@ for (i in 1:nrow(x)) {
           x$AirTC_Avg[i] <- -9999
           x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "m,") #
      } else {
-          if (x$AirTC_Avg[i] <- -40) {
+          if (x$AirTC_Avg[i] < -40) {
                x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "l,") # "l" temperature below valid range
           } else if (x$AirTC_Avg[i] > 70) {
                x$AirTC_Avg_qc[i] <- paste0(x$AirTC_Avg_qc[i], "h,") # "h" temperature above valid range
@@ -104,21 +106,25 @@ for (i in 1:nrow(x)) {
           x$AirTC_Max[i] <- -9999
           x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "m,") #
      } else {
-          if (x$AirTC_Max[i] <- -40) {
+          if (x$AirTC_Max[i] < -40) {
                x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "l,")
           } else if (x$AirTC_Max[i] > 70) {
                x$AirTC_Max_qc[i] <- paste0(x$AirTC_Max_qc[i], "h,")
           }
      }
      if (is.na(x$AirTC_Min[i])) {
-          x$AirTC_Avg[i] <- -9999
+          x$AirTC_Min[i] <- -9999
           x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "m,") #
      } else {
-          if (x$AirTC_Min[i] <- -40) {
+          if (x$AirTC_Min[i] < -40) {
                x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "l,")
           } else if (x$AirTC_Min[i] > 70) {
                x$AirTC_Min_qc[i] <- paste0(x$AirTC_Min_qc[i], "h,")
           }
+     }
+     if (is.na(x$AirTC_Std[i])) {
+          x$AirTC_Std[i] <- -9999
+          x$AirTC_Std_qc[i] <- paste0(x$AirTC_Std_qc[i], "m,") #
      }
      if (is.na(x$RHpct_Min[i])) {
           x$RHpct_Min[i] <- -9999
@@ -212,7 +218,8 @@ for (i in 1:nrow(x)) {
      if (x$Rain_mm_Tot_qc[i] == "") {x$Rain_mm_Tot_qc[i] <- "a"}
 }
 
-export <- x[,c(13,14,15,16,1,17,2,18,4,20,3,19,5,21,22,23,24,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)]
+export <- x[,c(15,16,17,18,1,19,2,20,4,22,3,21,5,23,14,24,13,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)]
+write_csv(export, "mellon.csv", append = TRUE)
 
 today <- Sys.Date()
 last_record <- x$unix_utc[nrow(x)]
