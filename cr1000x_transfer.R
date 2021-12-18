@@ -219,9 +219,91 @@ for (i in 1:nrow(x)) {
 }
 
 y <- x[,c(15,16,17,18,1,19,2,20,4,22,3,21,5,23,14,24,13,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)]
+write_csv(y, "/Users/davidkahler/Documents/Wind_Turbines/mellon_table.csv", append = TRUE)
 
+# Long format for CUAHSI upload
+y$site <- "DuqMellon"
+y$source <- "Duq-CERE"
 
-write_csv(export, "mellon.csv", append = TRUE)
+z <- pivot_longer(y, cols = c(BattV_Avg,AirTC_Avg,AirTC_Min,AirTC_Max,AirTC_Std,RHpct_Min,RHpct_Max,WS_ms_Avg,WS_ms_Min,WS_ms_Max,WS_ms_Std,WindDir_D1_WVT,WindDir_SD1_WVT,Rain_mm_Tot),
+                  names_to = "Variable",
+                  values_to = "Value")
+
+batt <- z %>% 
+     filter(Variable=="BattV_Avg") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,BattV_Avg_qc) %>% 
+     rename(qc = BattV_Avg_qc) %>% 
+     mutate(method = "Voltmeter")
+air_avg <- z %>% 
+     filter(Variable=="AirTC_Avg") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,AirTC_Avg_qc) %>% 
+     rename(qc = AirTC_Avg_qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+air_min <- z %>% 
+     filter(Variable=="AirTC_Min") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,AirTC_Min_qc) %>% 
+     rename(qc = AirTC_Min_qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+air_max <- z %>% 
+     filter(Variable=="AirTC_Max") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,AirTC_Max_qc) %>% 
+     rename(qc = AirTC_Max_qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+air_std <- z %>% 
+     filter(Variable=="AirTC_Std") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,AirTC_Std_qc) %>% 
+     rename(qc = AirTC_Std_qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+rh_min <- z %>% 
+     filter(Variable=="RHpct_Min") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,RHpct_Min_qc) %>% 
+     rename(qc = RHpct_Min_qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+rh_max <- z %>% 
+     filter(Variable=="RHpct_Max") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,RHpct_Max_qc) %>% 
+     rename(qc = RHpct_Max_qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+ws_avg <- z %>% 
+     filter(Variable=="WS_ms_Avg") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,WS_ms_Avg_qc) %>% 
+     rename(qc = WS_ms_Avg_qc) %>% 
+     mutate(method = "Wind")
+ws_min <- z %>% 
+     filter(Variable=="WS_ms_Min") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,WS_ms_Min_qc) %>% 
+     rename(qc = WS_ms_Min_qc) %>% 
+     mutate(method = "Wind")
+ws_max <- z %>% 
+     filter(Variable=="WS_ms_Max") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,WS_ms_Max_qc) %>% 
+     rename(qc = WS_ms_Max_qc) %>% 
+     mutate(method = "Wind")
+ws_std <- z %>% 
+     filter(Variable=="WS_ms_Std") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,WS_ms_Std_qc) %>% 
+     rename(qc = WS_ms_Std_qc) %>% 
+     mutate(method = "Wind")
+wdir <- z %>% 
+     filter(Variable=="WindDir_D1_WVT") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,WindDir_D1_WVT_qc) %>% 
+     rename(qc = WindDir_D1_WVT_qc) %>% 
+     mutate(method = "Wind")
+wdir_sd <- z %>% 
+     filter(Variable=="WindDir_SD1_WVT") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,WindDir_SD1_WVT_qc) %>% 
+     rename(qc = WindDir_SD1_WVT_qc) %>% 
+     mutate(method = "Wind")
+rain <- z %>% 
+     filter(Variable=="Rain_mm_Tot") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,Rain_mm_Tot_qc) %>% 
+     rename(qc = Rain_mm_Tot_qc) %>% 
+     mutate(method = "Rain")
+export <- rbind(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
+
+# sort
+
+write_csv(export, "/Users/davidkahler/Documents/Wind_Turbines/mellon_longer.csv", append = TRUE)
 
 today <- Sys.Date()
 last_record <- x$unix_utc[nrow(x)]
