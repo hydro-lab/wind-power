@@ -5,6 +5,7 @@ library(readr)
 library(tidyr)
 library(forcats)
 library(lubridate)
+library(ggplot2)
 
 x <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
 t <- read_csv("download_record.csv", col_names = FALSE) # all in UTC
@@ -315,3 +316,9 @@ r <- data.frame(today,first_record,last_record)
 write_csv(r, "download_record.csv", append = TRUE)
 
 # For export to hydro-lab.github.io, daily data and plots
+air <- export %>% 
+     mutate(RH=(RHpct_Min+RHpct_Max)/2)
+     filter(Variable==AirTC_Avg|Variable==AirTC_min|Variable==AirTC_max|RHpct_Min|RHpct_Max)
+
+ggplot(export) + 
+     geom_line(aes(x=time_et,y=Value,))
