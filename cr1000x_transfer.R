@@ -6,11 +6,11 @@ library(tidyr)
 library(forcats)
 library(lubridate)
 
-x <- read_csv("mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
+x <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
 t <- read_csv("download_record.csv", col_names = FALSE) # all in UTC
 
 # station installed on:
-install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
+#install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
 # previous download got to:
 first_record <- t$X3[nrow(t)] + 1 # moves to one second after last download, must rewrite
 # sort and tidy data. 
@@ -300,8 +300,8 @@ rain <- z %>%
      rename(qc = Rain_mm_Tot_qc) %>% 
      mutate(method = "Rain")
 export <- rbind(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
-
-# sort
+rm(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
+export <- export[order(export$unix_utc),]
 
 write_csv(export, "/Users/davidkahler/Documents/Wind_Turbines/mellon_longer.csv", append = TRUE)
 
