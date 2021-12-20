@@ -1,6 +1,0 @@
-"TOA5","mellon","CR1000X","27731","CR1000X.Std.05.00","CPU:MellonRoofSensors.CR1X","51655","MellonRoof"
-"TIMESTAMP","RECORD","BattV_Avg","AirTC_Avg","AirTC_Max","AirTC_TMx","AirTC_Min","AirTC_TMn","AirTC_Std","WS_ms_Avg","WS_ms_Max","WS_ms_TMx","WS_ms_Min","WS_ms_TMn","WS_ms_Std","WS_ms_S_WVT","WindDir_D1_WVT","WindDir_SD1_WVT","Rain_mm_Tot","RH_Max","RH_TMx","RH_Min","RH_TMn"
-"TS","RN","Volts","Deg C","Deg C","Deg C","Deg C","Deg C","Deg C","meters/second","meters/second","meters/second","meters/second","meters/second","meters/second","meters/second","Deg","Deg","mm","%","%","%","%"
-"","","Avg","Avg","Max","TMx","Min","TMn","Std","Avg","Max","TMx","Min","TMn","Std","WVc","WVc","WVc","Tot","Max","TMx","Min","TMn"
-"2021-12-01 22:15:00",0,12.89,7.838,7.88,"2021-12-01 22:14:40",7.811,"2021-12-01 22:14:55",0.015,0.929,2.254,"2021-12-01 22:14:58",0,"2021-12-01 22:14:34",0.766,0.929,336.9,0.025,0,69.2,"2021-12-01 22:14:53",68.23,"2021-12-01 22:14:34"
-"2021-12-01 22:30:00",1,12.88,7.709,7.867,"2021-12-01 22:15:09",7.544,"2021-12-01 22:29:28",0.079,1.479,4.214,"2021-12-01 22:29:14",0,"2021-12-01 22:15:20",0.819,1.479,332.5,0.192,0,72.68,"2021-12-01 22:28:18",68.82,"2021-12-01 22:15:17"
