@@ -6,6 +6,7 @@ library(tidyr)
 library(forcats)
 library(lubridate)
 library(ggplot2)
+library(latex2exp)
 
 x <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
 t <- read_csv("download_record.csv", col_names = FALSE) # all in UTC
@@ -318,11 +319,93 @@ r <- data.frame(today,first_record,last_record)
 write_csv(r, "download_record.csv", append = TRUE)
 
 # For export to hydro-lab.github.io, daily data and plots
-air <- export %>% 
-     filter(Variable==AirTC_Avg|Variable==AirTC_min|Variable==AirTC_max)
+this <- week(Sys.Date())
+lastweek <- export %>% 
+     mutate(time_et=ymd_hms(time_et)) %>% 
+     mutate(w = week(time_et)) %>% 
+     filter(w == (this-1)) %>% 
+     select(time_et,Variable,Value)
 
-     |RHpct_Min|RHpct_Max)
-mutate(RH=(RHpct_Min+RHpct_Max)/2)
+air <- lastweek %>% 
+     filter(Variable=="AirTC_Avg")
 
-ggplot(export) + 
-     geom_line(aes(x=time_et,y=Value,))
+air_temp <- ggplot(air) + 
+     geom_point(aes(x=time_et,y=Value)) + 
+     scale_x_datetime() +
+     xlab("Date") +
+     ylab("Air Temperature (Celcius)") +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) +
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 12))
+ggsave("airtemp.png", plot = air_temp, device = "png")
+
+rain <- lastweek %>% 
+     filter(Variable=="Rain_mm_Tot") %>% 
+     mutate(d=date(time_et)) %>% 
+     group_by(d) %>%
+     summarize(prcp=sum(Value, na.rm = TRUE))
+
+precip <- ggplot(rain) +
+     geom_col(aes(x=d,y=prcp)) +
+     xlab("Date") +
+     ylab("Precipitation (mm)") +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) +
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 12))
+ggsave("precip.png", plot = precip, device = "png")
+
+wind <- lastweek %>% 
+     pivot_wider(names_from = Variable, 
+                 values_from = "Value") %>% 
+     select(time_et,WS_ms_Min,WS_ms_Avg,WS_ms_Max,WindDir_D1_WVT) %>% 
+     rename(spd=WS_ms_Avg,dir=WindDir_D1_WVT)
+
+m <- max(wind$WS_ms_Avg)
+
+speed.bins <- 6
+dir.bins <- 36
+
+wind.sort <- array(0, dim = c(speed.bins, dir.bins))
+for (i in 1:nrow(wind)) {
+     j <- ceiling(wind$dir[i]/10)
+     k <- ceiling(wind$spd[i]/2)
+     if (k > 6) { # brute force correction for speeds over 12m/s
+          k <- 6
+     }
+     wind.sort[k,j] <- wind.sort[k,j] + 1
+}
+
+wind.long <- array(NA, dim = dir.bins*speed.bins)
+speeds <- c(rep("0-2",dir.bins), rep("2-4",dir.bins), rep("4-6",dir.bins), rep("6-8",36), rep("8-10",36), rep("above 10",36)) # be sure to fill in as many as the wind bins in "wind" allocation
+directions <- rep(5+10*(c(0:35)), speed.bins)
+for (i in 1:speed.bins) {
+     for (j in 1:dir.bins) {
+          wind.long[(dir.bins*(i-1))+j] <- wind.sort[i,j]
+     }
+}
+rose <- data.frame(directions, speeds, wind.long)
+windrose <- ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.long)) +
+     labs(caption = paste("Duquesne University")) +
+     geom_bar(position="stack", stat="identity") +
+     scale_fill_brewer("Speed (m/s)", palette = "Blues") +
+     coord_polar(theta = "x", start = 0) +
+     scale_x_continuous(breaks = seq(0, 360, 45)) +
+     theme_linedraw() +
+     theme(axis.title = element_blank(), panel.ontop = TRUE, panel.background = element_blank()) # NOTE: ylim used in export
+ggsave("windrose.png", plot = windrose, device = "png")
+
+wind.line <- wind %>% 
+     select(-dir) %>% 
+     rename(Minimum=WS_ms_Min,Mean=spd,Maximum=WS_ms_Max) %>% 
+     pivot_longer(cols = c(Minimum,Mean,Maximum),names_to = "Speed",values_to = "val")
+
+windline <- ggplot(wind.line) + 
+     geom_line(aes(x=time_et,y=val,color=Speed)) +
+     xlab("Date") +
+     ylab("Wind Speed (m/s)") +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) +
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 12))
+ggsave("windline.png", plot = windline, device = "png")
+
+
