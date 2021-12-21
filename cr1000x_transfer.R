@@ -11,7 +11,7 @@ x <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat"
 t <- read_csv("download_record.csv", col_names = FALSE) # all in UTC
 
 # station installed on:
-#install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
+install <- as.numeric(ymd_hms("2021-11-12T20:30:00")) # this is time in UTC
 # previous download got to:
 first_record <- t$X3[nrow(t)] + 1 # moves to one second after last download, must rewrite
 # sort and tidy data. 
@@ -39,7 +39,7 @@ x <- x %>%
             RHpct_TMx = X21, # time of maximum relative humidity
             RHpct_Min = X22, # minimum relative humidity
             RHpct_TMn = X23) %>% # time of minimum relative humidity
-     select(-RECORD, -WS_ms_S_WVT, -AirTC_TMx, -AirTC_TMn, -RHpct_TMx, -RHpct_TMn, -WS_ms_TMx, -WS_ms_TMn) %>% 
+     select(-RECORD, -WS_ms_S_WVT, -AirTC_TMx, -AirTC_TMn, -WS_ms_TMx, -WS_ms_TMn, -RHpct_TMx, -RHpct_TMn) %>% 
      mutate(time_utc = ymd_hms(TIMESTAMP), 
             unix_utc = as.numeric(time_utc), 
             time_et = with_tz(time_utc, tz = "US/Eastern"), 
@@ -49,7 +49,9 @@ x <- x %>%
             AirTC_Max_qc = "", 
             AirTC_Min_qc = "", 
             AirTC_Std_qc = "", 
+            #RHpct_Min = NA,
             RHpct_Min_qc = "", 
+            #RHpct_Max = NA,
             RHpct_Max_qc = "", 
             WS_ms_Avg_qc = "", 
             WS_ms_Max_qc = "", 
@@ -219,16 +221,16 @@ for (i in 1:nrow(x)) {
      if (x$Rain_mm_Tot_qc[i] == "") {x$Rain_mm_Tot_qc[i] <- "a"}
 }
 
-y <- x[,c(15,16,17,18,1,19,2,20,4,22,3,21,5,23,14,24,13,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)]
+#y <- x[,c(13,14,15,16,1,17,2,18,4,20,3,19,5,21,22,23,24,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)] # old, w/o RH
+y <- x[,c(15,16,17,18,1,19,2,20,4,22,3,21,5,23,14,24,13,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)] # New, post - 01 Dec 2021
 write_csv(y, "/Users/davidkahler/Documents/Wind_Turbines/mellon_table.csv", append = TRUE)
 
 # Long format for CUAHSI upload
-y$site <- "DuqMellon"
-y$source <- "Duq-CERE"
-
-z <- pivot_longer(y, cols = c(BattV_Avg,AirTC_Avg,AirTC_Min,AirTC_Max,AirTC_Std,RHpct_Min,RHpct_Max,WS_ms_Avg,WS_ms_Min,WS_ms_Max,WS_ms_Std,WindDir_D1_WVT,WindDir_SD1_WVT,Rain_mm_Tot),
+z <- pivot_longer(x, cols = c(BattV_Avg,AirTC_Avg,AirTC_Min,AirTC_Max,AirTC_Std,RHpct_Min,RHpct_Max,WS_ms_Avg,WS_ms_Min,WS_ms_Max,WS_ms_Std,WindDir_D1_WVT,WindDir_SD1_WVT,Rain_mm_Tot),
                   names_to = "Variable",
                   values_to = "Value")
+z$site <- "DuqMellon"
+z$source <- "Duq-CERE"
 
 batt <- z %>% 
      filter(Variable=="BattV_Avg") %>% 
@@ -317,8 +319,10 @@ write_csv(r, "download_record.csv", append = TRUE)
 
 # For export to hydro-lab.github.io, daily data and plots
 air <- export %>% 
-     mutate(RH=(RHpct_Min+RHpct_Max)/2)
-     filter(Variable==AirTC_Avg|Variable==AirTC_min|Variable==AirTC_max|RHpct_Min|RHpct_Max)
+     filter(Variable==AirTC_Avg|Variable==AirTC_min|Variable==AirTC_max)
+
+     |RHpct_Min|RHpct_Max)
+mutate(RH=(RHpct_Min+RHpct_Max)/2)
 
 ggplot(export) + 
      geom_line(aes(x=time_et,y=Value,))
