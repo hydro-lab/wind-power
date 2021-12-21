@@ -304,7 +304,7 @@ export <- rbind(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min
 rm(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
 export <- export[order(export$unix_utc),]
 export <- export[,c(2,3,4,5,6,7,10,8,9)]
-test <- export %>% 
+export <- export %>% 
      mutate(time_utc = as.character(time_utc)) %>% 
      mutate(time_et = as.character(time_et))
 
