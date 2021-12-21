@@ -127,7 +127,7 @@ for (i in 1:nrow(x)) {
           x$AirTC_Std[i] <- -9999
           x$AirTC_Std_qc[i] <- paste0(x$AirTC_Std_qc[i], "m,") #
      }
-     if (is.na(x$RHpct_Min[i])) {
+     if (is.na(x$RHpct_Min[i])) { # NOTE: should also fix to include screening for -9999 or other common error flags
           x$RHpct_Min[i] <- -9999
           x$RHpct_Min_qc[i] <- paste0(x$RHpct_Min_qc[i], "m,") #
      } else {
