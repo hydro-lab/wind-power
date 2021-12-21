@@ -337,7 +337,7 @@ air_temp <- ggplot(air) +
      theme(panel.background = element_rect(fill = "white", colour = "black")) +
      theme(aspect.ratio = 1) +
      theme(axis.text = element_text(face = "plain", size = 12))
-ggsave("airtemp.png", plot = air_temp, device = "png")
+ggsave("airtemp.jpg", plot = air_temp, device = "jpeg", dpi = 72)
 
 rain <- lastweek %>% 
      filter(Variable=="Rain_mm_Tot") %>% 
@@ -352,7 +352,7 @@ precip <- ggplot(rain) +
      theme(panel.background = element_rect(fill = "white", colour = "black")) +
      theme(aspect.ratio = 1) +
      theme(axis.text = element_text(face = "plain", size = 12))
-ggsave("precip.png", plot = precip, device = "png")
+ggsave("precip.jpg", plot = precip, device = "jpeg", dpi = 72)
 
 wind <- lastweek %>% 
      pivot_wider(names_from = Variable, 
@@ -392,7 +392,7 @@ windrose <- ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.lo
      scale_x_continuous(breaks = seq(0, 360, 45)) +
      theme_linedraw() +
      theme(axis.title = element_blank(), panel.ontop = TRUE, panel.background = element_blank()) # NOTE: ylim used in export
-ggsave("windrose.png", plot = windrose, device = "png")
+ggsave("windrose.jpg", plot = windrose, device = "jpeg", dpi = 72)
 
 wind.line <- wind %>% 
      select(-dir) %>% 
@@ -406,6 +406,6 @@ windline <- ggplot(wind.line) +
      theme(panel.background = element_rect(fill = "white", colour = "black")) +
      theme(aspect.ratio = 1) +
      theme(axis.text = element_text(face = "plain", size = 12))
-ggsave("windline.png", plot = windline, device = "png")
+ggsave("windline.jpg", plot = windline, device = "jpeg", dpi = 72)
 
 
