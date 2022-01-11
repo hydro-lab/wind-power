@@ -44,29 +44,108 @@ x <- x %>%
      mutate(time_utc = ymd_hms(TIMESTAMP), 
             unix_utc = as.numeric(time_utc), 
             time_et = with_tz(time_utc, tz = "US/Eastern"), 
-            utc_offset = (as.numeric(force_tz(time_et, tz = "UTC")) - unix_utc)/3600, 
-            BattV_Avg_qc = "", 
-            AirTC_Avg_qc = "", 
-            AirTC_Max_qc = "", 
-            AirTC_Min_qc = "", 
-            AirTC_Std_qc = "", 
-            #RHpct_Min = NA,
-            RHpct_Min_qc = "", 
-            #RHpct_Max = NA,
-            RHpct_Max_qc = "", 
-            WS_ms_Avg_qc = "", 
-            WS_ms_Max_qc = "", 
-            WS_ms_Min_qc = "", 
-            WS_ms_Std_qc = "", 
-            WindDir_D1_WVT_qc = "", 
-            WindDir_SD1_WVT_qc = "", 
-            Rain_mm_Tot_qc = "") %>% 
-     select(-TIMESTAMP) %>% 
-     filter(unix_utc >= first_record) # first_record or install date
+            utc_offset = (as.numeric(force_tz(time_et, tz = "UTC")) - unix_utc)/3600 ) %>%
+     select(-TIMESTAMP)
+
+#filter(unix_utc >= first_record) # This is done to only take the data since the last download.
 
 first_record <- x$unix_utc[1] # use this in subsequent downloads, not if the post-install must be redone.
 
-# For export to CUAHSI:
+# Record Level0:Raw data
+z <- pivot_longer(x, cols = c(BattV_Avg,AirTC_Avg,AirTC_Min,AirTC_Max,AirTC_Std,RHpct_Min,RHpct_Max,WS_ms_Avg,WS_ms_Min,WS_ms_Max,WS_ms_Std,WindDir_D1_WVT,WindDir_SD1_WVT,Rain_mm_Tot),
+                  names_to = "Variable",
+                  values_to = "Value")
+z$site <- "DuqMellon"
+z$source <- "Duq-CERE"
+z$qc <- "Level0"
+
+batt <- z %>% 
+     filter(Variable=="BattV_Avg") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Voltmeter")
+air_avg <- z %>% 
+     filter(Variable=="AirTC_Avg") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+air_min <- z %>% 
+     filter(Variable=="AirTC_Min") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+air_max <- z %>% 
+     filter(Variable=="AirTC_Max") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+air_std <- z %>% 
+     filter(Variable=="AirTC_Std") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+rh_min <- z %>% 
+     filter(Variable=="RHpct_Min") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+rh_max <- z %>% 
+     filter(Variable=="RHpct_Max") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Thermometer_hygrometer")
+ws_avg <- z %>% 
+     filter(Variable=="WS_ms_Avg") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Wind")
+ws_min <- z %>% 
+     filter(Variable=="WS_ms_Min") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Wind")
+ws_max <- z %>% 
+     filter(Variable=="WS_ms_Max") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Wind")
+ws_std <- z %>% 
+     filter(Variable=="WS_ms_Std") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Wind")
+wdir <- z %>% 
+     filter(Variable=="WindDir_D1_WVT") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Wind")
+wdir_sd <- z %>% 
+     filter(Variable=="WindDir_SD1_WVT") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Wind")
+rain <- z %>% 
+     filter(Variable=="Rain_mm_Tot") %>% 
+     select(unix_utc,Value,time_et,utc_offset,time_utc,site,Variable,source,qc) %>% 
+     mutate(method = "Rain")
+level0 <- rbind(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
+rm(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
+
+level0 <- level0[order(level0$unix_utc),]
+level0 <- level0[,c(2,3,4,5,6,7,10,8,9)]
+level0 <- level0 %>% 
+     mutate(time_utc = as.character(time_utc)) %>% 
+     mutate(time_et = as.character(time_et))
+
+write_csv(level0, "/Users/davidkahler/Documents/Wind_Turbines/DuqMellon_HIS.csv", append = TRUE)
+
+# QA/QC checks:
+
+BattV_Avg_qc = "", 
+AirTC_Avg_qc = "", 
+AirTC_Max_qc = "", 
+AirTC_Min_qc = "", 
+AirTC_Std_qc = "", 
+#RHpct_Min = NA,
+RHpct_Min_qc = "", 
+#RHpct_Max = NA,
+RHpct_Max_qc = "", 
+WS_ms_Avg_qc = "", 
+WS_ms_Max_qc = "", 
+WS_ms_Min_qc = "", 
+WS_ms_Std_qc = "", 
+WindDir_D1_WVT_qc = "", 
+WindDir_SD1_WVT_qc = "", 
+Rain_mm_Tot_qc = "") %>% 
+     
+
 for (i in 1:nrow(x)) {
      if (x$BattV_Avg[i] >= 10) {
           x$BattV_Avg_qc[i] <- "n" # "n" battery stable
@@ -224,7 +303,10 @@ for (i in 1:nrow(x)) {
 
 #y <- x[,c(13,14,15,16,1,17,2,18,4,20,3,19,5,21,22,23,24,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)] # old, w/o RH
 y <- x[,c(15,16,17,18,1,19,2,20,4,22,3,21,5,23,14,24,13,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)] # New, post - 01 Dec 2021
-write_csv(y, "/Users/davidkahler/Documents/Wind_Turbines/mellon_table.csv", append = TRUE)
+#write_csv(y, "/Users/davidkahler/Documents/Wind_Turbines/mellon_table.csv", append = TRUE) # commenting since we're mainly going to CUAHSI
+
+# Add quality control levels
+
 
 # Long format for CUAHSI upload
 z <- pivot_longer(x, cols = c(BattV_Avg,AirTC_Avg,AirTC_Min,AirTC_Max,AirTC_Std,RHpct_Min,RHpct_Max,WS_ms_Avg,WS_ms_Min,WS_ms_Max,WS_ms_Std,WindDir_D1_WVT,WindDir_SD1_WVT,Rain_mm_Tot),
@@ -305,13 +387,14 @@ rain <- z %>%
      mutate(method = "Rain")
 export <- rbind(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
 rm(batt,air_avg,air_min,air_max,air_std,rh_min,rh_max,ws_avg,ws_min,ws_max,ws_std,wdir,wdir_sd,rain)
+
 export <- export[order(export$unix_utc),]
 export <- export[,c(2,3,4,5,6,7,10,8,9)]
 export <- export %>% 
      mutate(time_utc = as.character(time_utc)) %>% 
      mutate(time_et = as.character(time_et))
 
-write_csv(export, "/Users/davidkahler/Documents/Wind_Turbines/mellon_longer.csv", append = TRUE)
+write_csv(export, "/Users/davidkahler/Documents/Wind_Turbines/DuqMellon_HIS.csv", append = TRUE)
 
 today <- Sys.Date()
 last_record <- x$unix_utc[nrow(x)]
