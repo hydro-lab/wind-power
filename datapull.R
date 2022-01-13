@@ -305,7 +305,7 @@ hist(speeds$pita.sp)
 #Add Mellon Data
 mell <- read_csv("https://duq.box.com/shared/static/hf1av8h6a3zny2eb9wcjwkfijs6zul8y.dat", skip=4, col_names=FALSE, col_types = "cnnnncncnnncncnnnnnncnc")
 mell <- mell%>%
-  rename(time=`X1`) %>%
+  rename(time=X1) %>%
   rename(rcrd=`X2`) %>%
   rename(batt=`X3`) %>%
   rename(temp=`X4`) %>%
@@ -328,5 +328,5 @@ mell <- mell%>%
   rename(hmxt=`X21`) %>%
   rename(hmmn=`X22`) %>%
   rename(hmnt=`X23`) %>%
-  mutate(time = mdy_hm(mell$Timestamp, tz="US/Eastern")) %>%
+  mutate(time = ymd_hms(time))
   
