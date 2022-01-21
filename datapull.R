@@ -329,4 +329,22 @@ mell <- mell%>%
   rename(hmmn=`X22`) %>%
   rename(hmnt=`X23`) %>%
   mutate(time = ymd_hms(time))
-  
+
+#Setting Up Linear Regression - Test
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("broom")
+install.packages("ggpubr")
+
+cor(mell$temp, mell$wspd)
+hist(mell$wspd)
+hist(mell$temp)
+hist(mell$wssd)
+hist(mell$prcp)
+
+plot(wssd ~ time, data = mell)
+
+#Model Building - linear
+model4=lm(pm25log~date + precip, data = lincoln_daily)
+summary(model4)
+confint(model4)
