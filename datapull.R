@@ -37,7 +37,8 @@ henz <- henz %>%
       rename(srrd=`Solar Radiation Sensor (Watts Per Square Meter)`) %>%
       rename(temp=`Thermometer (Fahrenheit)`) %>%
       rename(wdir=`Wind Vane  (Degrees)`) %>%
-      mutate(dt = mdy_hm(henz$Timestamp, tz="US/Eastern"))
+      mutate(dt = mdy_hm(henz$Timestamp, tz="US/Eastern")) %>%
+      mutate(dt = with_tz(dt,"UTC"))
 henz$wspd <- henz$wspd * 0.44704
 henz$gust <- henz$gust * 0.44704
 henz$baro <- henz$baro * 25.4
@@ -348,3 +349,26 @@ plot(wssd ~ time, data = mell)
 model4=lm(pm25log~date + precip, data = lincoln_daily)
 summary(model4)
 confint(model4)
+
+#Heinz Field and Airport - Sept 2020-Sept 2021 Dataframe
+henz.sept <- henz %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(henz.wind = wspd, henz.temp = temp, henz.baro = baro) %>%
+  select(dt, henz.wind, henz.temp, henz.baro) %>%
+  pivot_longer(cols = c (henz.wind, henz.temp, henz.baro), names_to = "variable", values_to = "value") 
+
+pita.sept <- pita %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(pita.wind = wspd, pita.temp = temp, pita.baro = baro) %>%
+  select(dt, pita.wind, pita.temp, pita.baro) %>%
+  pivot_longer(cols = c (pita.wind, pita.temp, pita.baro), names_to = "variable", values_to = "value")
+
+henz.pita.sept <- rbind(henz.sept, pita.sept)
+
+henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 1
+model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
+summary(model1)
