@@ -19,7 +19,8 @@ cath <- cath %>%
       rename(temp=`Thermometer (Fahrenheit)`) %>%
       rename(wdir=`Wind Vane (Degrees)`) %>%
       mutate(dt = mdy_hm(cath$Timestamp, tz="US/Eastern")) %>% # Stores time with time zone in lubridate function (POSIXct)
-      select(dt, wspd, gust, rhum, prcp, temp, wdir, baro)
+      select(dt, wspd, gust, rhum, prcp, temp, wdir, baro) %>%
+      mutate(dt = with_tz(dt,"UTC"))
 cath$wspd <- cath$wspd * 0.44704
 cath$gust <- cath$gust * 0.44704
 cath$baro <- cath$baro * 25.4
@@ -56,7 +57,8 @@ falk <- falk %>%
       rename(srrd=`Solar Radiation Sensor (Watts per Square Meter)`) %>%
       rename(temp=`Thermometer (Fahrenheit)`) %>%
       rename(wdir=`Wind Vane (Degrees)`) %>%
-      mutate(dt = mdy_hm(Timestamp, tz="US/Eastern"))
+      mutate(dt = mdy_hm(Timestamp, tz="US/Eastern"))%>%
+      mutate(dt = with_tz(dt,"UTC"))
 falk$wspd <- falk$wspd * 0.44704
 falk$gust <- falk$gust * 0.44704
 falk$baro <- falk$baro * 25.4
@@ -75,7 +77,8 @@ char <- char %>%
   rename(srrd=`Solar Radiation Sensor (Watts Per Square Meter)`) %>%
   rename(temp=`Thermometer (Fahrenheit)`) %>%
   rename(wdir=`Wind Vane (Degrees)`) %>%
-  mutate(dt = mdy_hm(Timestamp, tz="US/Eastern"))
+  mutate(dt = mdy_hm(Timestamp, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 char$wspd <- char$wspd * 0.44704
 char$gust <- char$gust * 0.44704
 char$baro <- char$baro * 25.4
@@ -94,7 +97,8 @@ penn <- penn %>%
   rename(srrd=`Solar Radiation Sensor (Watts Per Square Meter)`) %>%
   rename(temp=`Thermometer (Fahrenheit)`) %>%
   rename(wdir=`Wind Vane (Degrees)`) %>%
-  mutate(dt = mdy_hm(Timestamp, tz="US/Eastern"))
+  mutate(dt = mdy_hm(Timestamp, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 penn$wspd <- penn$wspd * 0.44704
 penn$gust <- penn$gust * 0.44704
 penn$baro <- penn$baro * 25.4
@@ -148,7 +152,8 @@ lib1 <- lib1%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms(prc, tz="US/Eastern"))
+  mutate(dt = ymd_hms(prc, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 lib1$wspd <- lib1$wspd * 0.44704
 lib1$prcp <- lib1$prcp * 25.4
 
@@ -163,7 +168,8 @@ lawr <- lawr%>%
   rename(wdir=`sonicwd`) %>%
   rename(baro=`bp`) %>%
   rename(srrd=`solarrad`) %>%
-  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 lawr$wspd <- lawr$wspd * 0.44704
 lawr$prcp <- lawr$prcp * 25.4
 
@@ -178,7 +184,8 @@ nobr <- nobr%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 nobr$wspd <- nobr$wspd * 0.44704
 nobr$prcp <- nobr$prcp * 25.4
 
@@ -192,7 +199,8 @@ pea1 <- pea1%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 pea1$wspd <- pea1$wspd * 0.44704
 pea1$prcp <- pea1$prcp * 25.4
 
@@ -207,7 +215,8 @@ pea2 <- pea2%>%
   rename(wdir=`scalar wind direction (degrees)`) %>%
   rename(baro=`baro (mmhg)`) %>%
   rename(srrd=`solarrad (w/m2)`) %>%
-  mutate(dt = ymd_hms(dt, tz="US/Eastern"))
+  mutate(dt = ymd_hms(dt, tz="US/Eastern"))%>%
+  mutate(dt = with_tz(dt,"UTC"))
 pea2$wspd <- pea2$wspd * 0.44704
 pea2$prcp <- pea2$prcp * 25.4
 
@@ -372,3 +381,4 @@ henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_fr
 #Model 1
 model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
 summary(model1)
+
