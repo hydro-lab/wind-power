@@ -440,3 +440,99 @@ penn.pita.sept <- pivot_wider(penn.pita.sept, names_from = "variable", values_fr
 #Model 5 
 model5 <- lm(penn.wind~pita.wind, data = penn.pita.sept)
 summary(model5)
+
+#Lawrenceville and Airport - Sept 2020-Sept 2021 Dataframe
+lawr.sept <- lawr %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(lawr.wind = wspd, lawr.temp = temp, lawr.baro = baro) %>%
+  select(dt, lawr.wind, lawr.temp, lawr.baro) %>%
+  pivot_longer(cols = c (lawr.wind, lawr.temp, lawr.baro), names_to = "variable", values_to = "value") 
+
+lawr.pita.sept <- rbind(lawr.sept, pita.sept)
+
+lawr.pita.sept <- pivot_wider(lawr.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 6 
+model6 <- lm(lawr.wind~pita.wind, data = lawr.pita.sept)
+summary(model6)
+
+#Liberty and Airport - Sept 2020-Sept 2021 Dataframe
+lib1.sept <- lib1 %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(lib1.wind = wspd, lib1.temp = temp, lib1.baro = baro) %>%
+  select(dt, lib1.wind, lib1.temp, lib1.baro) %>%
+  pivot_longer(cols = c (lib1.wind, lib1.temp, lib1.baro), names_to = "variable", values_to = "value") 
+
+lib1.pita.sept <- rbind(lib1.sept, pita.sept)
+
+lib1.pita.sept <- pivot_wider(lib1.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 7 
+model7 <- lm(lib1.wind~pita.wind, data = lib1.pita.sept)
+summary(model7)
+
+#North Braddock and Airport - Sept 2020-Sept 2021 Dataframe
+nobr.sept <- nobr %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(nobr.wind = wspd, nobr.temp = temp, nobr.baro = baro) %>%
+  select(dt, nobr.wind, nobr.temp, nobr.baro) %>%
+  pivot_longer(cols = c (nobr.wind, nobr.temp, nobr.baro), names_to = "variable", values_to = "value") 
+
+nobr.pita.sept <- rbind(nobr.sept, pita.sept)
+
+nobr.pita.sept <- pivot_wider(nobr.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 8 
+model8 <- lm(nobr.wind~pita.wind, data = nobr.pita.sept)
+summary(model8)
+
+#Parkway 1 and Airport - Sept 2020-Sept 2021 Dataframe
+pea1.sept <- pea1 %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(pea1.wind = wspd, pea1.temp = temp, pea1.baro = baro) %>%
+  select(dt, pea1.wind, pea1.temp, pea1.baro) %>%
+  pivot_longer(cols = c (pea1.wind, pea1.temp, pea1.baro), names_to = "variable", values_to = "value") 
+
+pea1.pita.sept <- rbind(pea1.sept, pita.sept)
+
+pea1.pita.sept <- pivot_wider(pea1.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 9 
+model9 <- lm(pea1.wind~pita.wind, data = pea1.pita.sept)
+summary(model9)
+
+#Parkway 2 and Airport - Sept 2020-Sept 2021 Dataframe
+pea2.sept <- pea2 %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(pea2.wind = wspd, pea2.temp = temp, pea2.baro = baro) %>%
+  select(dt, pea2.wind, pea2.temp, pea2.baro) %>%
+  pivot_longer(cols = c (pea2.wind, pea2.temp, pea2.baro), names_to = "variable", values_to = "value") 
+
+pea2.pita.sept <- rbind(pea2.sept, pita.sept)
+
+pea2.pita.sept <- pivot_wider(pea2.pita.sept, names_from = "variable", values_from = "value")
+
+#Model XI 
+modelxi <- lm(pea2.wind~pita.wind, data = pea2.pita.sept)
+summary(modelxi)
+
+#County Airport and Airport - Sept 2020-Sept 2021 Dataframe
+alla.sept <- alla %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(alla.wind = wspd, alla.temp = temp, alla.baro = baro) %>%
+  select(dt, alla.wind, alla.temp, alla.baro) %>%
+  pivot_longer(cols = c (alla.wind, alla.temp, alla.baro), names_to = "variable", values_to = "value") 
+
+alla.pita.sept <- rbind(alla.sept, pita.sept)
+
+alla.pita.sept <- pivot_wider(alla.pita.sept, names_from = "variable", values_from = "value")
+
+#Model X 
+modelx <- lm(alla.wind~pita.wind, data = alla.pita.sept)
+summary(modelx)
