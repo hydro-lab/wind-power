@@ -65,7 +65,6 @@ falk$baro <- falk$baro * 25.4
 falk$prcp <- falk$prcp * 25.4
 falk$temp <- falk$temp - 32 * 0.5556
 
-
 #Environmental Charter School
 char <- read_csv("https://duq.box.com/shared/static/q2wptl6izaeu1f4piz9gglxk0k50qfwr.csv", col_types = "cnnnnnnnn")
 char <- char %>%
@@ -341,10 +340,6 @@ mell <- mell%>%
   mutate(time = ymd_hms(time))
 
 #Setting Up Linear Regression - Test
-install.packages("ggplot2")
-install.packages("dplyr")
-install.packages("broom")
-install.packages("ggpubr")
 
 cor(mell$temp, mell$wspd)
 hist(mell$wspd)
@@ -382,3 +377,66 @@ henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_fr
 model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
 summary(model1)
 
+#Falk and Airport - Sept 2020-Sept 2021 Dataframe
+falk.sept <- falk %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(falk.wind = wspd, falk.temp = temp, falk.baro = baro) %>%
+  select(dt, falk.wind, falk.temp, falk.baro) %>%
+  pivot_longer(cols = c (falk.wind, falk.temp, falk.baro), names_to = "variable", values_to = "value") 
+
+falk.pita.sept <- rbind(falk.sept, pita.sept)
+
+falk.pita.sept <- pivot_wider(falk.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 2 
+model2 <- lm(falk.wind~pita.wind, data = falk.pita.sept)
+summary(model2)
+
+#Cathedral and Airport - Sept 2020-Sept 2021 Dataframe
+cath.sept <- cath %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(cath.wind = wspd, cath.temp = temp, cath.baro = baro) %>%
+  select(dt, cath.wind, cath.temp, cath.baro) %>%
+  pivot_longer(cols = c (cath.wind, cath.temp, cath.baro), names_to = "variable", values_to = "value") 
+
+cath.pita.sept <- rbind(cath.sept, pita.sept)
+
+cath.pita.sept <- pivot_wider(cath.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 3 
+model3 <- lm(cath.wind~pita.wind, data = cath.pita.sept)
+summary(model3)
+
+#Env Charter Scool and Airport - Sept 2020-Sept 2021 Dataframe
+char.sept <- char %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(char.wind = wspd, char.temp = temp, char.baro = baro) %>%
+  select(dt, char.wind, char.temp, char.baro) %>%
+  pivot_longer(cols = c (char.wind, char.temp, char.baro), names_to = "variable", values_to = "value") 
+
+char.pita.sept <- rbind(char.sept, pita.sept)
+
+char.pita.sept <- pivot_wider(char.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 4 
+model4 <- lm(char.wind~pita.wind, data = char.pita.sept)
+summary(model4)
+
+#Penn State and Airport - Sept 2020-Sept 2021 Dataframe
+penn.sept <- penn %>%
+  filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-09-01 00:00:00")) %>%
+  rename(penn.wind = wspd, penn.temp = temp, penn.baro = baro) %>%
+  select(dt, penn.wind, penn.temp, penn.baro) %>%
+  pivot_longer(cols = c (penn.wind, penn.temp, penn.baro), names_to = "variable", values_to = "value") 
+
+penn.pita.sept <- rbind(penn.sept, pita.sept)
+
+penn.pita.sept <- pivot_wider(penn.pita.sept, names_from = "variable", values_from = "value")
+
+#Model 5 
+model5 <- lm(penn.wind~pita.wind, data = penn.pita.sept)
+summary(model5)
