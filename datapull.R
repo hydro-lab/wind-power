@@ -376,6 +376,15 @@ henz.pita.sept2021 <- pivot_wider(henz.pita.sept2021, names_from = "variable", v
 modelsept2021 <- lm(henz.wind~pita.wind, data = henz.pita.sept2021)
 summary(modelsept2021)
 
+henz.pita.sept2021$henz.model <- modelsept2021$coefficients[1]+henz.pita.sept2021$pita.wind*modelsept2021$coefficients[2]
+ggplot(henz.pita.sept2021) + 
+     geom_point(aes(x=henz.wind,y=henz.model)) +
+     xlab("Actual Wind Speed (m/s)") +
+     ylab("Modeled Wind Speed (m/s)") +
+     theme(panel.background = element_rect(fill = "white", colour = "black")) +
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 12))
+
 #Heinz Field and Airport - Sept 2020-Sept 2021 Dataframe
 henz.sept <- henz %>%
   filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
