@@ -354,6 +354,28 @@ model4=lm(pm25log~date + precip, data = lincoln_daily)
 summary(model4)
 confint(model4)
 
+#Heinz Field and Airport - Sept 2021 Dataframe - One Month
+henz.sept2021 <- henz %>%
+  filter(dt>ymd_hms("2021-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-10-01 00:00:00")) %>%
+  rename(henz.wind = wspd, henz.temp = temp, henz.baro = baro) %>%
+  select(dt, henz.wind, henz.temp, henz.baro) %>%
+  pivot_longer(cols = c (henz.wind, henz.temp, henz.baro), names_to = "variable", values_to = "value") 
+
+pita.sept2021 <- pita %>%
+  filter(dt>ymd_hms("2021-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-10-01 00:00:00")) %>%
+  rename(pita.wind = wspd, pita.temp = temp, pita.baro = baro) %>%
+  select(dt, pita.wind, pita.temp, pita.baro) %>%
+  pivot_longer(cols = c (pita.wind, pita.temp, pita.baro), names_to = "variable", values_to = "value")
+
+henz.pita.sept2021 <- rbind(henz.sept2021, pita.sept2021)
+
+henz.pita.sept2021 <- pivot_wider(henz.pita.sept2021, names_from = "variable", values_from = "value")
+
+modelsept2021 <- lm(henz.wind~pita.wind, data = henz.pita.sept2021)
+summary(modelsept2021)
+
 #Heinz Field and Airport - Sept 2020-Sept 2021 Dataframe
 henz.sept <- henz %>%
   filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
@@ -377,6 +399,12 @@ henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_fr
 model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
 summary(model1)
 
+#Model test
+septembermodel.1 <- model1$coefficients[1]+henz.pita.sept$pita.wind*model1$coefficients[2]
+
+plot(henz.pita.sept$henz.wind, septembermodel.1, xlim = c(0,8), ylim = c(0,8))
+lines(c(0,8), c(0,8))
+
 #Model Temp
 modeltemp.henz.pita <- lm(henz.temp~pita.temp, data = henz.pita.sept)
 summary(modeltemp.henz.pita)
@@ -384,6 +412,9 @@ summary(modeltemp.henz.pita)
 #Model Pressure - Heinz and Pitt Airport Sept
 model.baro.henz.pita <- lm(henz.baro~pita.baro, data = henz.pita.sept)
 summary(model.baro.henz.pita)
+
+model.test <- lm(henz.wind~pita.wind+pita.baro, data=henz.pita.sept)
+summary(model.test)
 
 #Falk and Airport - Sept 2020-Sept 2021 Dataframe
 falk.sept <- falk %>%
