@@ -377,6 +377,14 @@ henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_fr
 model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
 summary(model1)
 
+#Model Temp
+modeltemp.henz.pita <- lm(henz.temp~pita.temp, data = henz.pita.sept)
+summary(modeltemp.henz.pita)
+
+#Model Pressure - Heinz and Pitt Airport Sept
+model.baro.henz.pita <- lm(henz.baro~pita.baro, data = henz.pita.sept)
+summary(model.baro.henz.pita)
+
 #Falk and Airport - Sept 2020-Sept 2021 Dataframe
 falk.sept <- falk %>%
   filter(dt>ymd_hms("2020-09-01 00:00:00")) %>%
@@ -392,6 +400,14 @@ falk.pita.sept <- pivot_wider(falk.pita.sept, names_from = "variable", values_fr
 #Model 2 
 model2 <- lm(falk.wind~pita.wind, data = falk.pita.sept)
 summary(model2)
+
+#Model Temperature - Falk and Pitt Airport Sept
+model.temp.falk.pita <- lm(falk.temp~pita.temp, data = falk.pita.sept)
+summary(model.temp.falk.pita)
+
+#Model Pressure - Falk and Pitt Airport Sept
+model.baro.falk.pita <- lm(falk.baro~pita.baro, data = falk.pita.sept)
+summary(model.baro.falk.pita)
 
 #Cathedral and Airport - Sept 2020-Sept 2021 Dataframe
 cath.sept <- cath %>%
@@ -536,3 +552,4 @@ alla.pita.sept <- pivot_wider(alla.pita.sept, names_from = "variable", values_fr
 #Model X 
 modelx <- lm(alla.wind~pita.wind, data = alla.pita.sept)
 summary(modelx)
+
