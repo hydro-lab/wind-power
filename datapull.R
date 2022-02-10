@@ -431,6 +431,8 @@ henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_fr
 #Model 1
 model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
 summary(model1)
+plot(model1)
+
 
 #Model test
 septembermodel.1 <- model1$coefficients[1]+henz.pita.sept$pita.wind*model1$coefficients[2]
@@ -617,3 +619,37 @@ alla.pita.sept <- pivot_wider(alla.pita.sept, names_from = "variable", values_fr
 modelx <- lm(alla.wind~pita.wind, data = alla.pita.sept)
 summary(modelx)
 
+#Falk and Airport - Sept 2021 Dataframe - One Month
+falk.sept2021 <- falk %>%
+  filter(dt>ymd_hms("2021-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-10-01 00:00:00")) %>%
+  rename(falk.wind = wspd, falk.temp = temp, falk.baro = baro) %>%
+  select(dt, falk.wind, falk.temp, falk.baro) %>%
+  pivot_longer(cols = c (falk.wind, falk.temp, falk.baro), names_to = "variable", values_to = "value") 
+
+pita.sept2021 <- pita %>%
+  filter(dt>ymd_hms("2021-09-01 00:00:00")) %>%
+  filter(dt<ymd_hms("2021-10-01 00:00:00")) %>%
+  rename(pita.wind = wspd, pita.temp = temp, pita.baro = baro) %>%
+  select(dt, pita.wind, pita.temp, pita.baro) %>%
+  pivot_longer(cols = c (pita.wind, pita.temp, pita.baro), names_to = "variable", values_to = "value")
+
+falk.pita.sept2021 <- rbind(falk.sept2021, pita.sept2021)
+
+falk.pita.sept2021 <- pivot_wider(falk.pita.sept2021, names_from = "variable", values_from = "value")
+
+modelfalk.pita.sept2021 <- lm(falk.wind~pita.wind, data = falk.pita.sept2021)
+summary(falk.pita.sept2021)
+
+falk.pita.sept2021$falk.model <- modelfalk.pita.sept2021$coefficients[1]+falk.pita.sept2021$pita.wind*falk.pita.sept2021$coefficients[2]
+library(ggplot2)
+ggplot(falk.pita.sept2021) + 
+  geom_point(aes(x=falk.wind,y=falk.model)) +
+  geom_abline(slope = 1, intercept = 0) +
+  xlab("Actual Wind Speed (m/s)") +
+  ylab("Modeled Wind Speed (m/s)") +
+  xlim(c(0,5)) +
+  ylim(c(0,5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
