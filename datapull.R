@@ -429,10 +429,46 @@ henz.pita.sept <- rbind(henz.sept, pita.sept)
 henz.pita.sept <- pivot_wider(henz.pita.sept, names_from = "variable", values_from = "value")
 
 #Model 1
-model1 <- lm(henz.wind~pita.wind, data = henz.pita.sept)
+model1 <- lm(henz.wind~pita.wind+pita.temp+pita.baro, data = henz.pita.sept)
 summary(model1)
-plot(model1)
 
+henz.pita.sept$henz.model <- model1$coefficients[1]+henz.pita.sept$pita.wind*model1$coefficients[2]
+library(ggplot2)
+ggplot(henz.pita.sept) + 
+  geom_point(aes(x=henz.wind,y=henz.model)) +
+  #geom_smooth(aes(x=henz.wind,y=henz.model), method="lm") +
+  geom_abline(slope = 1, intercept = 0) +
+  xlab("Actual Wind Speed (m/s)") +
+  ylab("Modeled Wind Speed (m/s)") +
+  xlim(c(0,5)) +
+  ylim(c(0,5)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+
+#Gamma Distribution Model
+henz.pita.sept.nonzero <- henz.pita.sept %>%
+  filter(pita.wind >0) %>% filter(henz.wind>0)
+model1.glm <- glm(henz.wind~pita.wind+pita.baro, family = Gamma(link="identity"), data = henz.pita.sept.nonzero)
+summary(model1.glm)
+henz.pita.sept.nonzero$model1 <- model1.glm$coefficients[1]+henz.pita.sept.nonzero$pita.wind*model1.glm$coefficients[2]+model1.glm$coefficients[3]*henz.pita.sept.nonzero$pita.baro
+
+ggplot(henz.pita.sept.nonzero) + 
+  geom_point(aes(x=henz.wind,y=model1)) +
+  geom_abline(slope = 1, intercept = 0) +
+  xlab("Actual Wind Speed (m/s)") +
+  ylab("Modeled Wind Speed (m/s)") +
+  xlim(c(0,8)) +
+  ylim(c(0,8)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+
+henz.pita.sept.nonzero.nonna <- henz.pita.sept.nonzero %>%
+  filter(is.na(model1)==FALSE) %>%
+  filter(is.na(henz.wind)==FALSE)
+
+cor(henz.pita.sept.nonzero.nonna$henz.wind,henz.pita.sept.nonzero.nonna$model1)
 
 #Model test
 septembermodel.1 <- model1$coefficients[1]+henz.pita.sept$pita.wind*model1$coefficients[2]
