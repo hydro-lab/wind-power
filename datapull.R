@@ -531,7 +531,7 @@ cath.falk.sept.wind.baro.nonzero <- cath.falk.sept %>%
   filter(cath.wind >0) %>% filter(falk.wind>0) %>% filter(falk.baro>0)
 cath.falk.sept.2020.2021.wind.baro.glm <- glm(cath.wind~falk.wind+falk.baro, family = Gamma(link="identity"), data = cath.falk.sept.nonzero)
 summary(cath.falk.sept.2020.2021.wind.baro.glm)
-#Problems Start Again Here
+#Problems Start Again Here - Perhaps we adding another variable
 cath.falk.sept.wind.baro.nonzero$cath.falk.sept.2020.2021.wind.baro.glm <- cath.falk.sept.2020.2021.wind.baro.glm$coefficients[1]+cath.falk.sept.wind.baro.nonzero$cath.wind*cath.falk.sept.2020.2021.wind.baro.glm$coefficients[2]+cath.falk.sept.2020.2021.wind.baro.glm$coefficients
 
 cath.falk.sept.wind.baro.nonzero.nonna <- cath.falk.sept.wind.baro.nonzero %>%
