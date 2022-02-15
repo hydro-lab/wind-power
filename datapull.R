@@ -497,9 +497,7 @@ cath.falk.sept <- pivot_wider(cath.falk.sept, names_from = "variable", values_fr
 cath.falk.sept.2020.2021 <- lm(cath.wind~falk.wind, data = cath.falk.sept)
 summary(cath.falk.sept.2020.2021)
 
-#GLM of Cathedral of Learning and Falk Sept 2020-Sept 2021 - Just Wind
-
-#Gamma Distribution Model
+#GLM of Cathedral of Learning and Falk Sept 2020-Sept 2021 - Just Wind - Gamma Distribution Model
 cath.falk.sept.nonzero <- cath.falk.sept %>%
   filter(cath.wind >0) %>% filter(falk.wind>0)
 cath.falk.sept.2020.2021.glm <- glm(cath.wind~falk.wind, family = Gamma(link="identity"), data = cath.falk.sept.nonzero)
@@ -519,8 +517,36 @@ ggplot(cath.falk.sept.nonzero) +
 
 cor(cath.falk.sept.nonzero$cath.wind,cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm)
 
+#MK Cannot Figure Out What is Going on With these Non NA Values
 cath.falk.sept.nonzero.nonna <- cath.falk.sept.nonzero %>%
   filter(is.na(cath.falk.sept.2020.2021)==FALSE)%>%
   filter(is.na(falk.wind)==FALSE)
 
-cor(henz.pita.sept.nonzero.nonna$henz.wind,henz.pita.sept.nonzero.nonna$model1)
+#Linear Model of Cathedral of Learning and Falk Sept 2020-Sept 2021 - Wind and Baro
+cath.falk.sept.2020.2021.wind.baro <- lm(cath.wind~falk.wind+falk.baro, data = cath.falk.sept)
+summary(cath.falk.sept.2020.2021.wind.baro)
+
+#GLM of Cathedral of Learning and Falk Sept 2020-Sept 2021 - Wind and Baro - Gamma Distribution Model
+cath.falk.sept.wind.baro.nonzero <- cath.falk.sept %>%
+  filter(cath.wind >0) %>% filter(falk.wind>0) %>% filter(falk.baro>0)
+cath.falk.sept.2020.2021.wind.baro.glm <- glm(cath.wind~falk.wind+falk.baro, family = Gamma(link="identity"), data = cath.falk.sept.nonzero)
+summary(cath.falk.sept.2020.2021.wind.baro.glm)
+#Problems Start Again Here
+cath.falk.sept.wind.baro.nonzero$cath.falk.sept.2020.2021.wind.baro.glm <- cath.falk.sept.2020.2021.wind.baro.glm$coefficients[1]+cath.falk.sept.wind.baro.nonzero$cath.wind*cath.falk.sept.2020.2021.wind.baro.glm$coefficients[2]+cath.falk.sept.2020.2021.wind.baro.glm$coefficients
+
+cath.falk.sept.wind.baro.nonzero.nonna <- cath.falk.sept.wind.baro.nonzero %>%
+  filter(is.na(cath.falk.sept.2020.2021.wind.baro)==FALSE)%>%
+  filter(is.na(falk.wind)==FALSE)
+
+ggplot(cath.falk.sept.wind.baro.nonzero) + 
+  geom_point(aes(x=cath.wind,y=cath.falk.sept.2020.2021.wind.baro.glm)) +
+  geom_abline(slope = 1, intercept = 0) +
+  xlab("Actual Wind Speed (m/s)") +
+  ylab("Modeled Wind Speed (m/s)") +
+  xlim(c(0,8)) +
+  ylim(c(0,8)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+
+cor(cath.falk.sept.nonzero$cath.wind,cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm)
