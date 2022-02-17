@@ -494,7 +494,7 @@ cath.falk.sept <- rbind(cath.sept, falk.sept)
 cath.falk.sept <- pivot_wider(cath.falk.sept, names_from = "variable", values_from = "value")
 
 #Linear Model of Cathedral of Learning and Falk Sept 2020-Sept 2021 - Just Wind
-cath.falk.sept.2020.2021 <- lm(cath.wind~falk.wind, data = cath.falk.sept)
+cath.falk.sept.2020.2021 <- lm(cath.wind~ 0 + falk.wind, data = cath.falk.sept)
 summary(cath.falk.sept.2020.2021)
 
 #Linear Model of Falk and Cathedral of Learning (other way) Sept 2020-Sept 2021 - Just Wind
@@ -502,15 +502,18 @@ falk.cath.sept <- rbind(falk.sept, cath.sept)
 
 falk.cath.sept <- pivot_wider(falk.cath.sept, names_from = "variable", values_from = "value")
 
-falk.cath.sept.2020.2021 <- lm(falk.wind~cath.wind, data = falk.cath.sept)
+falk.cath.sept.2020.2021 <- lm(falk.wind~0 + cath.wind, data = falk.cath.sept)
 summary(falk.cath.sept.2020.2021)
+
+falk.cath.sept$falk.cath.sept.lm <- falk.cath.sept.2020.2021$coefficients[1]*falk.cath.sept$cath.wind
+plot(falk.cath.sept$falk.cath.sept.lm, falk.cath.sept$falk.wind)
 
 #GLM of Cathedral of Learning and Falk Sept 2020-Sept 2021 - Just Wind - Gamma Distribution Model
 cath.falk.sept.nonzero <- cath.falk.sept %>%
   filter(cath.wind >0) %>% filter(falk.wind>0)
 cath.falk.sept.2020.2021.glm <- glm(cath.wind~falk.wind, family = Gamma(link="identity"), data = cath.falk.sept.nonzero)
 summary(cath.falk.sept.2020.2021.glm)
-cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm <- cath.falk.sept.2020.2021.glm$coefficients[1]+cath.falk.sept.nonzero$cath.wind*cath.falk.sept.2020.2021.glm$coefficients[2]+cath.falk.sept.2020.2021.glm$coefficients
+cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm <- cath.falk.sept.2020.2021.glm$coefficients[1]+cath.falk.sept.nonzero$falk.wind*cath.falk.sept.2020.2021.glm$coefficients[2]
 
 ggplot(cath.falk.sept.nonzero) + 
   geom_point(aes(x=cath.wind,y=cath.falk.sept.2020.2021.glm)) +
@@ -530,7 +533,7 @@ cath.falk.sept.nonzero <- cath.falk.sept %>%
   filter(cath.wind >0) %>% filter(falk.wind>0)
 cath.falk.sept.2020.2021.glm <- glm(cath.wind~falk.wind, family = Gamma(link="inverse"), data = cath.falk.sept.nonzero)
 summary(cath.falk.sept.2020.2021.glm)
-cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm <- cath.falk.sept.2020.2021.glm$coefficients[1]+cath.falk.sept.nonzero$cath.wind*cath.falk.sept.2020.2021.glm$coefficients[2]+cath.falk.sept.2020.2021.glm$coefficients
+cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm <- cath.falk.sept.2020.2021.glm$coefficients[1]-cath.falk.sept.nonzero$falk.wind*cath.falk.sept.2020.2021.glm$coefficients[2]
 
 ggplot(cath.falk.sept.nonzero) + 
   geom_point(aes(x=cath.wind,y=cath.falk.sept.2020.2021.glm)) +
