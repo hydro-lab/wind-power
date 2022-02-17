@@ -525,6 +525,26 @@ ggplot(cath.falk.sept.nonzero) +
 
 cor(cath.falk.sept.nonzero$cath.wind,cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm)
 
+#Inverse
+cath.falk.sept.nonzero <- cath.falk.sept %>%
+  filter(cath.wind >0) %>% filter(falk.wind>0)
+cath.falk.sept.2020.2021.glm <- glm(cath.wind~falk.wind, family = Gamma(link="inverse"), data = cath.falk.sept.nonzero)
+summary(cath.falk.sept.2020.2021.glm)
+cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm <- cath.falk.sept.2020.2021.glm$coefficients[1]+cath.falk.sept.nonzero$cath.wind*cath.falk.sept.2020.2021.glm$coefficients[2]+cath.falk.sept.2020.2021.glm$coefficients
+
+ggplot(cath.falk.sept.nonzero) + 
+  geom_point(aes(x=cath.wind,y=cath.falk.sept.2020.2021.glm)) +
+  geom_abline(slope = 1, intercept = 0) +
+  xlab("Actual Wind Speed (m/s)") +
+  ylab("Modeled Wind Speed (m/s)") +
+  xlim(c(0,8)) +
+  ylim(c(0,8)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+
+cor(cath.falk.sept.nonzero$cath.wind,cath.falk.sept.nonzero$cath.falk.sept.2020.2021.glm)
+
 #GLM of Falk and Cathedral of Learning (other way) Sept 2020-Sept 2021 - Just Wind - Gamma Distribution Model
 falk.cath.sept.nonzero <- falk.cath.sept %>%
   filter(falk.wind >0) %>% filter(cath.wind>0)
@@ -544,6 +564,27 @@ ggplot(falk.cath.sept.nonzero) +
   theme(axis.text = element_text(face = "plain", size = 12))
 
 cor(falk.cath.sept.nonzero$falk.wind,falk.cath.sept.nonzero$falk.cath.sept.2020.2021.glm)
+
+#Inverse
+falk.cath.sept.nonzero <- falk.cath.sept %>%
+  filter(falk.wind >0) %>% filter(cath.wind>0)
+falk.cath.sept.2020.2021.glm <- glm(falk.wind~cath.wind, family = Gamma(link="inverse"), data = falk.cath.sept.nonzero)
+summary(falk.cath.sept.2020.2021.glm)
+falk.cath.sept.nonzero$falk.cath.sept.2020.2021.glm <- falk.cath.sept.2020.2021.glm$coefficients[1]+falk.cath.sept.nonzero$falk.wind*falk.cath.sept.2020.2021.glm$coefficients[2]+falk.cath.sept.2020.2021.glm$coefficients
+
+ggplot(falk.cath.sept.nonzero) + 
+  geom_point(aes(x=falk.wind,y=falk.cath.sept.2020.2021.glm)) +
+  geom_abline(slope = 1, intercept = 0) +
+  xlab("Actual Wind Speed (m/s)") +
+  ylab("Modeled Wind Speed (m/s)") +
+  xlim(c(0,8)) +
+  ylim(c(0,8)) +
+  theme(panel.background = element_rect(fill = "white", colour = "black")) +
+  theme(aspect.ratio = 1) +
+  theme(axis.text = element_text(face = "plain", size = 12))
+
+cor(falk.cath.sept.nonzero$falk.wind,falk.cath.sept.nonzero$falk.cath.sept.2020.2021.glm)
+
 
 #MK Cannot Figure Out What is Going on With these Non NA Values
 cath.falk.sept.nonzero.nonna <- cath.falk.sept.nonzero %>%
