@@ -304,6 +304,14 @@ for (i in 1:nrow(x)) {
      if (x$WindDir_D1_WVT_qc[i] == "") {x$WindDir_D1_WVT_qc[i] <- "a"}
      if (x$WindDir_SD1_WVT_qc[i] == "") {x$WindDir_SD1_WVT_qc[i] <- "a"}
      if (x$Rain_mm_Tot_qc[i] == "") {x$Rain_mm_Tot_qc[i] <- "a"}
+     # Correct wind direction:
+     for (i in 1:nrow(x)) {
+          if (x$WindDir_D1_WVT[i] > 180) {
+               x$WindDir_D1_WVT[i] <- x$WindDir_D1_WVT[i] -180
+          } else {
+               x$WindDir_D1_WVT[i] <- x$WindDir_D1_WVT[i] + 180
+          }
+     }
 }
 
 #y <- x[,c(13,14,15,16,1,17,2,18,4,20,3,19,5,21,22,23,24,25,6,26,8,28,7,27,9,29,10,30,11,31,12,32)] # old, w/o RH
