@@ -117,9 +117,18 @@ for (i in 1:nrow(y)) {
 }
 z <- eweibull(y$ws, method = "mle") # https://search.r-project.org/CRAN/refmans/EnvStats/html/eweibull.html
 
+# plot data and Weibull distrubution
+m <- (c(1:100)) / 10
+shape <- as.numeric(z$parameters[1])
+scal <- as.numeric(z$parameters[2])
+n <- (shape/scal) * (m/scal)^(shape-1) * exp(-((m/scal)^shape))
+wei <- data.frame(m,n)
 
+h <- hist(y$ws)
+pos <- h$mids
+dns <- h$density
+dat <- data.frame(pos,dns)
 
-
-
-
-
+ggplot() +
+     geom_col(data=dat, aes(x=pos,y=dns)) +
+     geom_line(data=wei, aes(x=m,y=n))
