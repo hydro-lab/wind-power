@@ -5,6 +5,7 @@ library(forcats)
 library(lubridate)
 library(ggplot2)
 library(EnvStats)
+library(e1071)
 
 x1 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
 x2 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat.backup", skip = 4, col_names = FALSE)
@@ -128,6 +129,8 @@ h <- hist(y$ws)
 pos <- h$mids
 dns <- h$density
 dat <- data.frame(pos,dns)
+
+geo_mean <- gamma((shape+1)/shape)
 
 ggplot() +
      geom_col(data=dat, aes(x=pos,y=dns)) +
