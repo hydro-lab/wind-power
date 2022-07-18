@@ -2,6 +2,8 @@ library(readr)
 library(dplyr)
 library(lubridate)
 
+library(e1071)
+
 #Collected 24 May 2022
 may.wind <- read.csv("https://duq.box.com/shared/static/hmths6ofu40ox2n9shvrdydawd57e7v2.dat")
 
