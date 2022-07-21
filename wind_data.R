@@ -12,8 +12,10 @@ library(e1071)
 #x1 is from May 2022 and includes relative humidity information
 #x2 is from December and does not include relative humidity information
 #both skip the first 4 rows of data as they are actually the titles of the variables
-x1 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
-x2 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat.backup", skip = 4, col_names = FALSE)
+#x1 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
+#x2 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat.backup", skip = 4, col_names = FALSE)
+x1 <- read_csv("C:/users/raniim/desktop/socialmedia/mk/wind/winddata/mellon_MellonRoof.dat", skip = 4, col_names = FALSE) 
+x2 <- read_csv("C:/users/raniim/desktop/socialmedia/mk/wind/winddata/mellon_MellonRoof.dat.backup", skip = 4, col_names = FALSE) 
 
 #adding 4 columns to dataset missing rel humidity so the column numbers match and we can put the datasets together (~November 2021)
 x2$X20 <- NA
@@ -131,21 +133,24 @@ for (i in 1:nrow(y)) {
 #Creating a Weibull distribution using our Mellon data. This produced the mean and the standard deviation
 z <- eweibull(y$ws, method = "mle") # https://search.r-project.org/CRAN/refmans/EnvStats/html/eweibull.html
 
-# plot data and Weibull distrubution
-m <- (c(1:100)) / 10  #creating a bunch of numbers to run through the distribution (from 0.1 to 10)
-shape <- as.numeric(z$parameters[1]) #using the mean as a parameter
-scal <- as.numeric(z$parameters[2]) #using the standard deviation as a parameter
+# Weibull distrubution parameterized by our data
+m <- (c(1:100)) / 10  #creating a range of numbers to run through the distribution (from 0.1 to 10)
+shape <- as.numeric(z$parameters[1]) #shape factor from weibull method
+scal <- as.numeric(z$parameters[2]) #scale factor from weibull method
 n <- (shape/scal) * (m/scal)^(shape-1) * exp(-((m/scal)^shape)) #Weibull equation
-wei <- data.frame(m,n) #showing the weibull distribution with outlined parameters
+wei <- data.frame(m,n) #getting equation into dataframe
 
 #histogram of wind speed
 h <- hist(y$ws)
 pos <- h$mids
 dns <- h$density
-dat <- data.frame(pos,dns) #showing histogram of wind speed
+dat <- data.frame(pos,dns) #getting histogram into dataframe so we can plot
 
-geo_mean <- gamma((shape+1)/shape) #geometric mean using gamma 
+geo_mean <- scal* gamma((shape+1)/shape) #geometric mean using gamma function of weibull dist
 
-ggplot() +
+ggplot() + #graphing histogram idealized dist and idealized geometric mean
      geom_col(data=dat, aes(x=pos,y=dns)) +
-     geom_line(data=wei, aes(x=m,y=n))
+     geom_line(data=wei, aes(x=m,y=n)) + 
+     geom_vline(xintercept = geo_mean)
+
+
