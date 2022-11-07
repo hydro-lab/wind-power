@@ -74,7 +74,12 @@ for (i in 1:nrow(y)) {
 }
 
 #breaking up by month
-select(x1$X1 > "2022-01-01 00:00:00")
+#finding mean and standard deviation
+monthly.wind <- y %>% 
+     mutate(y=year(time_et), m=month(time_et), ym=y*100+m) %>%
+     group_by(ym) %>%
+     summarise(ws_mean=mean(WS_ms_Avg), ws_sd=sd(WS_ms_Avg))
+
 
 
 ## Wind Rose
