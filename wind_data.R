@@ -14,8 +14,8 @@ library(e1071)
 #both skip the first 4 rows of data as they are actually the titles of the variables
 #x1 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat", skip = 4, col_names = FALSE)
 #x2 <- read_csv("/Users/davidkahler/Documents/Wind_Turbines/mellon_MellonRoof.dat.backup", skip = 4, col_names = FALSE)
-x1 <- read_csv("C:/users/raniim/desktop/socialmedia/mk/wind/winddata/mellon_MellonRoof.dat", skip = 4, col_names = FALSE) 
-x2 <- read_csv("C:/users/raniim/desktop/socialmedia/mk/wind/winddata/mellon_MellonRoof.dat.backup", skip = 4, col_names = FALSE) 
+x1 <- read_csv("https://duq.box.com/shared/static/hmths6ofu40ox2n9shvrdydawd57e7v2.dat", skip = 4, col_names = FALSE) 
+x2 <- read_csv("https://duq.box.com/shared/static/hf1av8h6a3zny2eb9wcjwkfijs6zul8y.dat", skip = 4, col_names = FALSE) 
 
 #adding 4 columns to dataset missing rel humidity so the column numbers match and we can put the datasets together (~November 2021)
 x2$X20 <- NA
@@ -73,10 +73,15 @@ for (i in 1:nrow(y)) {
      }
 }
 
+#breaking up by month
+select(x1$X1 > "2022-01-01 00:00:00")
+
+
 ## Wind Rose
 #Creating several "buckets" for the wind speed to be in - there are 8 buckets
 ## sort data:
 d <- y$WindDir
+
 s <- y$WS_ms_Avg
 speed.bins <- 8 
 wind <- array(0, dim = c(36,speed.bins))
@@ -151,6 +156,11 @@ geo_mean <- scal* gamma((shape+1)/shape) #geometric mean using gamma function of
 ggplot() + #graphing histogram idealized dist and idealized geometric mean
      geom_col(data=dat, aes(x=pos,y=dns)) +
      geom_line(data=wei, aes(x=m,y=n)) + 
-     geom_vline(xintercept = geo_mean)
-
+     geom_vline(xintercept = geo_mean) +
+     xlab("Wind Speed (m/s)") + 
+     ylab("Frequency") + 
+     theme(panel.background = element_rect(fill = "white", colour = "black")) + 
+     theme(legend.position="right") + 
+     theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 12))
 

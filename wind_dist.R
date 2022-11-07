@@ -13,3 +13,4 @@ mean(may.wind)
 sd(may.wind)
 kurtosis(may.wind)
 skewness(may.wind)
+
