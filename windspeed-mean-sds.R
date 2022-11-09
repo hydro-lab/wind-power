@@ -7,6 +7,7 @@ library(lubridate)
 library(ggplot2)
 library(EnvStats)
 library(e1071)
+library(curl)
 
 #reading in data from weather station
 #x1 is from May 2022 and includes relative humidity information
@@ -119,3 +120,9 @@ may.wind<- y %>%
      filter(time_et>ymd_hms("2022-05-01 00:00:00")) %>%
      filter(time_et>ymd_hms("2022-05-17 10:30:00")) %>%
      summarise(ws_mean=mean(WS_ms_Avg), ws_sd=sd(WS_ms_Avg))
+
+h$mids
+
+h = hist(y$WS_ms_Avg, # built-in histogram function.  To find values only.  Plotting is at the end of this loop.
+         breaks=seq(0,12,by=0.1),
+         plot=TRUE) 
