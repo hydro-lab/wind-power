@@ -123,6 +123,7 @@ may.wind<- y %>%
 
 h$mids
 
-h = hist(y$WS_ms_Avg, # built-in histogram function.  To find values only.  Plotting is at the end of this loop.
+# built-in histogram function.  broke up wind speed averages into bins
+h = hist(y$WS_ms_Avg,
          breaks=seq(0,12,by=0.1),
          plot=TRUE) 
