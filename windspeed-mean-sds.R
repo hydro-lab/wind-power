@@ -149,21 +149,22 @@ a <- y %>%
      select(unix_utc, time_et, WS_ms_Avg)
      
 p <- read_csv("https://duq.box.com/shared/static/oicvh5p4dmv2a8sj1tz9qg8wwuneukwo.csv")
+p <- rename(p, c(speed=`m/s`, power=Watts)) # Didn't like the names...
 #do linear interpolation of power curve - MARCH 23 2023
 #plot(p$`m/s`, p$Watts)
 
 for (i in 1:nrow(a)) {
-     if(is.na(a$WS_ms_Avg)[i]){
-          a$power[i]<-na
-     } else if(a$WS_ms_Avg[i] < p$`m/s`[j]) {
-          a$power[i]<-0
-     } else if(a$WS_ms_Avg[i] < p$`m/s`[nrow(p)]) {
-          a$power[i] <- p$Watts[nrow(p)]
+     if (is.na(a$WS_ms_Avg[i])) {
+          a$power[i] <- NA
+     } else if (a$WS_ms_Avg[i] < p$speed[1]) {
+          a$power[i] <- 0
+     } else if (a$WS_ms_Avg[i] >= p$speed[nrow(p)]) {
+          a$power[i] <- p$power[nrow(p)]
      } else {
           for (j in 2:nrow(p)) {
-               if ( (p$`m/s`[j-1] <= a$WS_ms_Avg[i]) & (a$WS_ms_Avg[i] < p$`m/s`[j]) ) {
-                    m <- (p$watt[j] - p$Watts[j-1])/(p$`m/s`[j] - p$`m/s`[j-1])
-                    a$power[m * (i-p$`m/s`[j-1]+p$Watts[j-1]
+               if ( (p$speed[j-1] <= a$WS_ms_Avg[i]) & (a$WS_ms_Avg[i] < p$speed[j]) ) {
+                    m <- (p$power[j] - p$power[j-1])/(p$speed[j] - p$speed[j-1])
+                    a$power[i] <- m * (a$WS_ms_Avg[i] - p$speed[j-1]) + p$power[j-1]
                }
           }
      }
