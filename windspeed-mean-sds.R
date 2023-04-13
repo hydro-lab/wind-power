@@ -170,6 +170,28 @@ for (i in 1:nrow(a)) {
      }
 }
 
+# Power to energy  
+energy <- a %>%
+     mutate(y=year(time_et)) %>%
+     mutate(m=month(time_et)) %>%
+     mutate(ym=100*y+m) %>%
+     mutate(e=(power*0.25)/1000) %>% # energy in kWh (Watts \times hours / 1000), 15 minute interval
+     group_by(ym) %>%
+     summarize(energy=sum(e)) %>% # total kWh per month
+     mutate(y=floor(ym/100)) %>%
+     mutate(m=ym-(100*y)) %>%
+     mutate(dt=as_date(ymd(paste0(y,"-",m,"-01"))))
+
+ggplot(energy) +
+     geom_line(aes(x=dt,y=energy)) + 
+     geom_point(aes(x=dt,y=energy)) + 
+     xlab("Time") + 
+     ylab("Wind Energy (kWh)") + 
+     theme(panel.background = element_rect(fill = "white", colour = "black")) + 
+     theme(legend.position="right") + 
+     #theme(aspect.ratio = 1) +
+     theme(axis.text = element_text(face = "plain", size = 12))     
+
 #Creating a Weibull distribution using our Mellon data. This produced the mean and the standard deviation
 z <- eweibull(y$WS_ms_Avg, method = "mle") # https://search.r-project.org/CRAN/refmans/EnvStats/html/eweibull.html
 
