@@ -151,7 +151,7 @@ a <- y %>%
 p <- read_csv("https://duq.box.com/shared/static/oicvh5p4dmv2a8sj1tz9qg8wwuneukwo.csv")
 p <- rename(p, c(speed=`m/s`, power=Watts)) # Didn't like the names...
 #do linear interpolation of power curve - MARCH 23 2023
-#plot(p$`m/s`, p$Watts)
+#plot(p$speed, p$power)
 
 for (i in 1:nrow(a)) {
      if (is.na(a$WS_ms_Avg[i])) {
