@@ -30,7 +30,7 @@ rename(TIMESTAMP = X1, # date and time
        VPD = X16, #VPD, kPA
        Batt_Percent = X17, # battery Percent
        BattV_Avg = X18, #battery voltage, mV
-       select(lightning, light_dist, AxisY, AxisX, BattV_Avg, Batt_Percent) %>%
+       select(-lightning, -light_dist, -AxisY, -AxisX, -BattV_Avg, -Batt_Percent) %>%
        pivot_longer(c(TIMESTAMP, Rain_mm_Tot, WindDir_D1_WVT, WS_ms, WS_ms_Gust, AirTC, VaporPressure, AtmoPressure, Rain_mm_Max, RHpct, VPD), names_to="measurement",values_to="values")
 
 ytower <- pivot_wider(x, names_from = "measurement", values_from = "values")
