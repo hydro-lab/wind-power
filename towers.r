@@ -9,10 +9,11 @@ library(EnvStats)
 library(e1071)
 
 #towers data
-x4 <- read_csv("https://duq.box.com/shared/static/kut0ofyzfe9s0azmq0vsptypka4azmoi.csv", skip = 3, col_names = FALSE)
+x4 <- read_csv("https://duq.box.com/shared/static/7otcf32r2nlf8hy28zc1vcwrl6eqa7q2.csv", skip = 2, col_names = FALSE)
 
 #renaming columns
-rename(TIMESTAMP = X1, # date and time
+x4 <- x4 %>%
+     rename(TIMESTAMP = X1, # date and time
        Solar_Rad = X2, #solar radiation, w/m2
        Rain_mm_Tot = X3, # incremental rainfall, mm
        lightning = X4, #lightning activity
@@ -21,30 +22,21 @@ rename(TIMESTAMP = X1, # date and time
        WS_ms = X7, # wind speed in m/s
        WS_ms_Gust = X8, #wind gust in m/s
        AirTC = X9, # air temperature, degrees C
-       VaporPressure = X10, #vapor pressure, kPa
+       RHpct = X10, #vapor pressure, kPa
        AtmoPressure = X11, #atmospheric pressure, kPa
        AxisX = X12, #degrees x-axis level
        AxisY = X13, #degrees y-axis level
        Rain_mm_Max = X14 , #max. precipitation rate, mm/hr
-       RHpct = X15, #relative humidity, degrees C
-       VPD = X16, #VPD, kPA
-       Batt_Percent = X17, # battery Percent
-       BattV_Avg = X18, #battery voltage, mV
-       select(-lightning, -light_dist, -AxisY, -AxisX, -BattV_Avg, -Batt_Percent) %>%
-       pivot_longer(c(TIMESTAMP, Rain_mm_Tot, WindDir_D1_WVT, WS_ms, WS_ms_Gust, AirTC, VaporPressure, AtmoPressure, Rain_mm_Max, RHpct, VPD), names_to="measurement",values_to="values")
+       RH_temp = X15, # RH sensor temperature, degrees C
+       Batt_Percent = X16, # battery Percent
+       BattV_Avg = X17) %>% #battery voltage, mV
+     select(-lightning, -light_dist, -AxisY, -AxisX, -BattV_Avg, -Batt_Percent, -RH_temp, Rain_mm_Max) # %>%
+#     pivot_longer(c(Solar_Rad, Rain_mm_Tot, WindDir_D1_WVT, WS_ms, WS_ms_Gust, AirTC, AtmoPressure, RHpct), names_to="measurement",values_to="values")
 
-ytower <- pivot_wider(x, names_from = "measurement", values_from = "values")
+# ytower <- pivot_wider(x4, names_from = "measurement", values_from = "values")
 
-ytower <- y %>% 
-     mutate(time_utc = ymd_hms(TIMESTAMP), 
-            unix_utc = as.numeric(time_utc), 
-            time_et = with_tz(time_utc, tz = "US/Eastern"), 
-            utc_offset = (as.numeric(force_tz(time_et, tz = "UTC")) - unix_utc)/3600 ) %>%
-     select(-TIMESTAMP)
-       
-
-y <- y %>% 
-     mutate(time_utc = ymd_hms(TIMESTAMP), 
+ytower <- x4 %>% 
+     mutate(time_utc = mdy_hm(TIMESTAMP), 
             unix_utc = as.numeric(time_utc), 
             time_et = with_tz(time_utc, tz = "US/Eastern"), 
             utc_offset = (as.numeric(force_tz(time_et, tz = "UTC")) - unix_utc)/3600 ) %>%
