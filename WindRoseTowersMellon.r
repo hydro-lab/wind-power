@@ -290,11 +290,11 @@ speed.bins <- 8 # this used for monthly data at HFP
 wind <- array(0, dim = c(36,speed.bins))
 for (i in 1:(length(s))) {
      speed.index <- ceiling(s[i]) # HFP will work with this binning.
-     if (speed.index >8) {
-          speed.index <- 8
+     if (is.na(speed.index) == FALSE) { # this is needed as some NAs were introduced in QC for flipped leads in datalogger.
+          if (speed.index >8) {
+               speed.index <- 8
+          }
      }
-     
-     
      wind[ceiling(d[i]/10),speed.index] <- wind[ceiling(d[i]/10),speed.index] + 1
 }
 ## Now, form long array rather than wide:
@@ -310,7 +310,7 @@ directions <- rep(5+10*(c(0:35)), speed.bins)
 rose <- data.frame(directions, speeds, wind.long)
 
 windMellon <- ggplot(rose, aes(fill = fct_rev(speeds), x = directions, y = wind.long)) +
-     labs(caption = paste("Towers Hall")) +
+     labs(caption = paste("Mellon Hall")) +
      geom_bar(position="stack", stat="identity") +
      scale_fill_brewer("Speed (m/s)", palette = "Blues") +
      coord_polar(theta = "x", start = 0) +
