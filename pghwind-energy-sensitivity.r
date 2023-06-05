@@ -39,6 +39,7 @@ p.cath <- read_csv("https://duq.box.com/shared/static/oicvh5p4dmv2a8sj1tz9qg8wwu
 p.cath <- rename(p.cath, c(speed=`m/s`, power=Watts)) 
 #do linear interpolation of power curve
 #plot(p$`m/s`, p$Watts)
+a.cath$power <- NA # Preallocation of column
 
 for (i in 1:nrow(a.cath)) {
      if (is.na(a.cath$wspd[i])) {
@@ -59,10 +60,10 @@ for (i in 1:nrow(a.cath)) {
 
 #power to energy
 energy.cath <- a.cath %>%
-     mutate(y=year(time_et)) %>%
-     mutate(m=month(time_et)) %>%
+     mutate(y=year(dt)) %>%
+     mutate(m=month(dt)) %>%
      mutate(ym=100*y+m) %>%
-     mutate(e=power*15*60) %>% #energy in Joules (Watts/ times seconds), 15 minute interval
+     mutate(e=power*60*60) %>% #energy in Joules (Watts/ times seconds), 60 minute interval
      group_by(ym) %>%
      summarize(energy=sum(e)) %>%
      mutate(y=floor(ym/100)) %>%
