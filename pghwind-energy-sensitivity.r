@@ -35,7 +35,7 @@ cath$temp <- (cath$temp - 32) * 0.5556
 a.cath <- cath %>%
      select(dt, wspd)
 
-p.cath <- read_csv("https://duq.box.com/shared/static/oicvh5p4dmv2a8sj1tz9qg8wwuneukwo.csv")
+p.cath <- read_csv("https://duq.box.com/shared/static/oicvh5p4dmv2a8sj1tz9qg8wwuneukwo.csv") # POWER CURVE
 p.cath <- rename(p.cath, c(speed=`m/s`, power=Watts)) 
 #do linear interpolation of power curve
 #plot(p$`m/s`, p$Watts)
