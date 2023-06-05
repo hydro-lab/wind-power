@@ -30,7 +30,7 @@ cath$wspd <- cath$wspd * 0.44704
 cath$gust <- cath$gust * 0.44704
 cath$baro <- cath$baro * 25.4
 cath$prcp <- cath$prcp * 25.4
-cath$temp <- cath$temp - 32 * 0.5556
+cath$temp <- (cath$temp - 32) * 0.5556
 
 a.cath <- cath %>%
      select(dt, wspd)
